@@ -4,6 +4,7 @@ import type { DrillConfig } from './catalog';
 import { generateIntervalQuestion } from './intervals';
 import { generateChordQuestion } from './chords';
 import { generateDegreeQuestion, generateFunctionQuestion } from './functional';
+import { generateProgressionQuestion } from './progressions';
 
 export { DRILLS, DRILL_GROUPS, findDrill, type DrillConfig } from './catalog';
 
@@ -21,5 +22,7 @@ export function generateQuestion(config: DrillConfig, rng: Rng, stats?: StatsTab
       return generateDegreeQuestion(config, rng, stats);
     case 'functions':
       return generateFunctionQuestion(config, rng, stats);
+    case 'progressions':
+      return generateProgressionQuestion(config, rng, stats);
   }
 }

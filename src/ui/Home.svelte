@@ -38,7 +38,7 @@
   </section>
 {/each}
 
-<footer>Progressions and voicings are next.</footer>
+<footer>Jazz voicings are next.</footer>
 
 <style>
   header { margin: 1.5rem 0 2.25rem; }

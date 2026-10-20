@@ -15,6 +15,13 @@
 
   const stats = $derived(progress.drills[drill.id] ?? {});
   const answered = $derived(picked !== null);
+  // Answer layout: many short labels → compact grid; long labels → one per row.
+  const layout = $derived.by(() => {
+    if (!question) return '';
+    const longest = Math.max(...question.choices.map((c) => c.label.length + (c.detail?.length ?? 0)));
+    if (longest > 16) return 'list';
+    return question.choices.length > 6 ? 'compact' : '';
+  });
   const wasRight = $derived(answered && picked === question?.answer);
 
   // Each playback gets a ticket so a newer sound (e.g. a resolution) can cut off an older one.
@@ -91,10 +98,11 @@
 </div>
 
 {#if question}
-  <div class="choices" class:compact={question.choices.length > 6} role="group" aria-label="Your answer">
+  <div class="choices {layout}" role="group" aria-label="Your answer">
     {#each question.choices as c (c.value)}
       <button class={choiceState(c.value)} onclick={() => answer(c.value)} disabled={answered}>
-        {c.label}
+        <span>{c.label}</span>
+        {#if c.detail}<span class="detail">{c.detail}</span>{/if}
       </button>
     {/each}
   </div>
@@ -190,6 +198,18 @@
     gap: 0.5rem;
   }
   .choices.compact { grid-template-columns: repeat(auto-fill, minmax(4.75rem, 1fr)); }
+  .choices.list { grid-template-columns: 1fr; }
+  .choices.list button {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    min-height: 2.9rem;
+    padding: 0.4rem 1rem;
+    text-align: left;
+  }
+  .detail { color: var(--dim); font-size: var(--step--1); font-weight: 400; }
+  .choices .right .detail, .choices .wrong .detail { color: inherit; }
   .choices button {
     min-height: 3.25rem;
     padding: 0.5rem;

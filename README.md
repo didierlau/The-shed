@@ -46,7 +46,7 @@ Add an entry to `src/core/drills/catalog.ts`. No other change needed.
 1. ~~Intervals~~
 2. ~~Chord qualities~~ (triads, 7ths, 6ths, shells)
 3. ~~Functional hearing~~ (scale degrees and diatonic chords against a ii–V–I)
-4. Progressions: ii–V–I, turnarounds, rhythm changes
+4. ~~Progressions~~ (ii–V–Is, turnarounds, reharmonisations, standards building blocks)
 5. Jazz voicings: shells, drop-2, rootless, upper structures
 6. Offline support (service worker) and Play Store wrapper (Capacitor)
 

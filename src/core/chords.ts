@@ -18,6 +18,7 @@ export const CHORD_QUALITIES = {
   '6': { label: 'Major 6' },
   m6: { label: 'Minor 6' },
   '7sus4': { label: '7sus4' },
+  '7b9': { label: 'Dominant 7♭9' },
 } as const;
 
 export type ChordQuality = keyof typeof CHORD_QUALITIES;

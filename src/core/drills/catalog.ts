@@ -2,14 +2,20 @@ import { ALL_INTERVALS } from '../intervals';
 import type { IntervalDrillConfig } from './intervals';
 import type { ChordDrillConfig } from './chords';
 import type { DegreeDrillConfig, FunctionDrillConfig } from './functional';
+import type { ProgressionDrillConfig } from './progressions';
 import { MAJOR_KEYS } from '../keys';
 
 /**
  * All drills in the app, in suggested order.
  * Adding a level = adding an entry here. Future drill kinds
- * (progressions, voicings) join this union.
+ * (voicings) join this union.
  */
-export type DrillConfig = IntervalDrillConfig | ChordDrillConfig | DegreeDrillConfig | FunctionDrillConfig;
+export type DrillConfig =
+  | IntervalDrillConfig
+  | ChordDrillConfig
+  | DegreeDrillConfig
+  | FunctionDrillConfig
+  | ProgressionDrillConfig;
 
 const RANGE: [string, string] = ['C3', 'C5'];
 const ROOTS: [string, string] = ['C3', 'G3'];
@@ -210,6 +216,49 @@ export const DRILLS: DrillConfig[] = [
     functions: ['I', 'ii', 'iii', 'IV', 'V', 'vi', 'vii'],
     keys: MAJOR_KEYS,
   },
+  {
+    kind: 'progressions',
+    id: 'progressions-ii-v',
+    title: 'Major or minor ii\u2060–\u2060V',
+    description: 'The most important sound in jazz, in both flavours.',
+    progressions: ['ii-V-I', 'ii-V-i'],
+    keys: EASY_KEYS,
+  },
+  {
+    kind: 'progressions',
+    id: 'progressions-turnarounds',
+    title: 'Turnarounds',
+    description: 'Four ways back to the top of the tune.',
+    progressions: ['I-vi-ii-V', 'I-VI7-ii-V', 'iii-VI7-ii-V', 'I-vi-ii-bII7'],
+    keys: EASY_KEYS,
+  },
+  {
+    kind: 'progressions',
+    id: 'progressions-colours',
+    title: 'Reharmonised turnarounds',
+    description: 'Tritone subs, the Dameron turnaround and the backdoor ii\u2060–\u2060V.',
+    progressions: ['I-vi-ii-V', 'I-vi-ii-bII7', 'dameron', 'backdoor'],
+    keys: MAJOR_KEYS,
+  },
+  {
+    kind: 'progressions',
+    id: 'progressions-standards',
+    title: 'Building blocks of standards',
+    description: 'Rhythm-changes bridge, blues, backdoor and ii\u2060–\u2060V\u2060–\u2060I.',
+    progressions: ['ii-V-I', 'rhythm-bridge', 'blues-start', 'backdoor'],
+    keys: MAJOR_KEYS,
+  },
+  {
+    kind: 'progressions',
+    id: 'progressions-all',
+    title: 'All progressions',
+    description: 'Every progression, every key. Adaptive to your weak spots.',
+    progressions: [
+      'ii-V-I', 'ii-V-i', 'I-vi-ii-V', 'I-VI7-ii-V', 'iii-VI7-ii-V',
+      'I-vi-ii-bII7', 'dameron', 'backdoor', 'rhythm-bridge', 'blues-start',
+    ],
+    keys: MAJOR_KEYS,
+  },
 ];
 
 /** Home-screen sections, in order. Each lists the drill kinds it shows. */
@@ -217,6 +266,7 @@ export const DRILL_GROUPS: { kinds: DrillConfig['kind'][]; title: string }[] = [
   { kinds: ['intervals'], title: 'Intervals' },
   { kinds: ['chords'], title: 'Chord qualities' },
   { kinds: ['degrees', 'functions'], title: 'Functional hearing' },
+  { kinds: ['progressions'], title: 'Progressions' },
 ];
 
 export function findDrill(id: string): DrillConfig | undefined {

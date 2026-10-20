@@ -40,9 +40,10 @@ export const FUNCTIONS = {
 } as const satisfies Record<string, { label: string; degree: Degree; quality: ChordQuality }>;
 export type HarmonicFunction = keyof typeof FUNCTIONS;
 
-/** Name of a degree's note in a key, e.g. ("Eb", "b7") → "Db". */
+/** Name of a degree's note in a key, e.g. ("Eb", "b7") → "Db". Double flats/sharps are simplified (♭3 of G♭ is A). */
 export function degreeNote(key: MajorKey, degree: Degree): string {
-  return Note.transpose(key, DEGREES[degree].interval);
+  const note = Note.transpose(key, DEGREES[degree].interval);
+  return Note.get(note).acc.length > 1 ? Note.simplify(note) : note;
 }
 
 /** Chord symbol for a function in a key, e.g. ("Bb", "ii") → "Cm7". */

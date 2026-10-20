@@ -20,6 +20,8 @@ export interface Choice {
   value: string;
   /** Human label, e.g. "Minor 3rd". */
   label: string;
+  /** Optional secondary text shown next to the label, e.g. "tritone sub". */
+  detail?: string;
 }
 
 /** A single question produced by a drill. The UI shows it, the audio layer plays it. */
