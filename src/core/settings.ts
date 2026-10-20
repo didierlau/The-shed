@@ -13,6 +13,11 @@ export interface NoteRange {
 export interface Settings {
   /** Where interval, chord-quality and scale-degree questions are played. */
   range: NoteRange;
+  /**
+   * With the microphone, let the lowest note heard decide the bass (slash chords).
+   * Off by default: through a phone mic, resonating low strings can pose as the bass.
+   */
+  micUsesBass: boolean;
 }
 
 /** Lowest and highest notes the range can be set to (A1–C7). */
@@ -27,20 +32,21 @@ export const RANGE_PRESETS: { label: string; range: NoteRange }[] = [
   { label: 'A1–C7', range: { low: RANGE_LIMITS.low, high: RANGE_LIMITS.high } },
 ];
 
-export const DEFAULT_SETTINGS: Settings = { range: { ...RANGE_PRESETS[0]!.range } };
+export const DEFAULT_SETTINGS: Settings = { range: { ...RANGE_PRESETS[0]!.range }, micUsesBass: false };
 
 /**
  * Make any stored or edited settings valid: whole numbers, inside the limits,
  * low below high, and at least MIN_RANGE_SPAN apart (widening upwards first).
  */
 export function normaliseSettings(raw: Partial<Settings> | undefined): Settings {
+  const micUsesBass = raw?.micUsesBass === true;
   const r = raw?.range;
-  if (!r || !Number.isFinite(r.low) || !Number.isFinite(r.high)) return structuredClone(DEFAULT_SETTINGS);
+  if (!r || !Number.isFinite(r.low) || !Number.isFinite(r.high)) return { ...structuredClone(DEFAULT_SETTINGS), micUsesBass };
   let low = Math.round(Math.min(r.low, r.high));
   let high = Math.round(Math.max(r.low, r.high));
   low = clamp(low, RANGE_LIMITS.low, RANGE_LIMITS.high - MIN_RANGE_SPAN);
   high = clamp(high, low + MIN_RANGE_SPAN, RANGE_LIMITS.high);
-  return { range: { low, high } };
+  return { range: { low, high }, micUsesBass };
 }
 
 /** Move one end of the range by some semitones, keeping the range valid. */

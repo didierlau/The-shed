@@ -74,7 +74,10 @@ export interface ChordGuess {
 
 const mod12 = (n: number) => ((n % 12) + 12) % 12;
 
-function scoreTemplate(pcs: Set<number>, bass: number, root: number, t: Template): { score: number; wrong: number } | null {
+/** When the bass can't decide, prefer the chords jazz uses most (Dm7 rather than F6/D's twin F6). */
+const COMMON = new Set(['maj7', '7', 'm7', 'm7♭5']);
+
+function scoreTemplate(pcs: Set<number>, bass: number | null, root: number, t: Template): { score: number; wrong: number } | null {
   const rel = new Set([...pcs].map((pc) => mod12(pc - root)));
   if (!t.tones.every((tone) => rel.has(tone))) return null;
   const optionalHits = (t.optional ?? []).filter((o) => rel.has(o)).length;
@@ -86,9 +89,11 @@ function scoreTemplate(pcs: Set<number>, bass: number, root: number, t: Template
 
   let score = 10 * t.tones.length + 3 * optionalHits - 14 * wrong;
   if (rootPlayed) score += 6;
-  if (mod12(bass) === root) score += 8;
-  // Slash chords are less common than a chord over its own root.
-  else if (rootPlayed) score -= 4;
+  if (bass !== null) {
+    if (mod12(bass) === root) score += 8;
+    // Slash chords are less common than a chord over its own root.
+    else if (rootPlayed) score -= 4;
+  } else if (COMMON.has(t.symbol)) score += 0.5;
   if (!t.noFifth && rel.has(7)) score += 1;
   // A chord with the root missing needs every tone to count: otherwise any three notes fit something.
   // Rootless readings only make sense where the 3rd defines the chord, so never for sus chords.
@@ -99,15 +104,24 @@ function scoreTemplate(pcs: Set<number>, bass: number, root: number, t: Template
   return { score, wrong };
 }
 
+export interface NameOptions {
+  /**
+   * Let the lowest note decide the root and write slash chords (default). Turn off
+   * when the lowest note can't be trusted, e.g. a phone mic picking up resonating
+   * low strings: the name then depends only on which notes sound.
+   */
+  useBass?: boolean;
+}
+
 /**
  * Best names for the sounding notes (MIDI numbers), best first.
  * Needs at least three different pitch classes; returns [] otherwise.
  */
-export function nameChord(midiNotes: number[], max = 3): ChordGuess[] {
+export function nameChord(midiNotes: number[], max = 3, options: NameOptions = {}): ChordGuess[] {
   if (midiNotes.length === 0) return [];
   const pcs = new Set(midiNotes.map(mod12));
   if (pcs.size < 3) return [];
-  const bass = Math.min(...midiNotes);
+  const bass = options.useBass === false ? null : Math.min(...midiNotes);
 
   const guesses: ChordGuess[] = [];
   for (let root = 0; root < 12; root++) {
@@ -115,7 +129,7 @@ export function nameChord(midiNotes: number[], max = 3): ChordGuess[] {
       const result = scoreTemplate(pcs, bass, root, t);
       if (result === null) continue;
       const rootless = !pcs.has(root);
-      const slash = !rootless && mod12(bass) !== root ? `/${ROOT_NAMES[mod12(bass)]}` : '';
+      const slash = bass !== null && !rootless && mod12(bass) !== root ? `/${ROOT_NAMES[mod12(bass)]}` : '';
       guesses.push({ symbol: ROOT_NAMES[root] + t.symbol + slash, root, score: result.score, rootless, unexplained: result.wrong });
     }
   }

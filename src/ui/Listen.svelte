@@ -6,6 +6,7 @@
   import { buildDictionary } from '../core/listen/calibration';
   import { MicTranscriber } from '../core/listen/strikes';
   import { loadCalibration } from '../storage/calibration';
+  import { loadSettings, saveSettings } from '../storage/settings';
   import Keyboard from './Keyboard.svelte';
 
   type Source = 'midi' | 'mic';
@@ -19,9 +20,19 @@
   let guesses = $state<ChordGuess[]>([]);
   let history = $state<ChordEvent[]>([]);
   const calibration = loadCalibration();
+  let settings = $state(loadSettings());
+  // With MIDI the notes are exact, so the bass is always used.
+  const useBass = $derived(source === 'midi' || settings.micUsesBass);
+
+  function setMicUsesBass(on: boolean) {
+    settings.micUsesBass = on;
+    saveSettings($state.snapshot(settings));
+    tracker = new ChordTracker(source === 'mic' ? 0 : 80, { useBass: on });
+    track();
+  }
 
   let session: MidiSession | MicSession | null = null;
-  let tracker = new ChordTracker(80);
+  let tracker = new ChordTracker(80, { useBass: true });
   let ticker: ReturnType<typeof setInterval> | null = null;
 
   const best = $derived(guesses[0]);
@@ -37,7 +48,7 @@
     error = '';
     stop();
     // Mic notes arrive already settled per strike, so they count straight away.
-    tracker = new ChordTracker(source === 'mic' ? 0 : 80);
+    tracker = new ChordTracker(source === 'mic' ? 0 : 80, { useBass: source === 'midi' || settings.micUsesBass });
     try {
       if (source === 'midi') {
         session = await startMidi({
@@ -134,6 +145,17 @@
       <span class="desc">Play each key once, about 30 seconds. Makes mic detection far more reliable.</span>
     </a>
   {/if}
+  <label class="toggle">
+    <input type="checkbox" checked={settings.micUsesBass} onchange={(e) => setMicUsesBass(e.currentTarget.checked)} />
+    <span>
+      Use the lowest note as the bass
+      <span class="desc">
+        {useBass
+          ? 'Slash chords like C/E are shown. Resonating low strings can sometimes be taken for the bass.'
+          : 'Chords are named from the notes alone, so resonating low strings can’t change the name.'}
+      </span>
+    </span>
+  </label>
 {/if}
 
 <div class="stage" aria-live="polite">
@@ -190,6 +212,17 @@
   }
   .segment.on { border-color: var(--brass); color: var(--lamp); background: color-mix(in srgb, var(--brass) 14%, var(--navy-raised)); }
   .segment:disabled { opacity: 0.4; cursor: default; }
+
+  .toggle {
+    display: flex;
+    gap: 0.75rem;
+    align-items: flex-start;
+    margin-top: 0.75rem;
+    min-height: 44px;
+    cursor: pointer;
+  }
+  .toggle input { width: 1.25rem; height: 1.25rem; margin-top: 0.15rem; accent-color: var(--brass); flex: none; }
+  .toggle .desc { display: block; color: var(--dim); font-size: var(--step--1); }
 
   .calibrated { margin: 0.25rem 0 0; color: var(--dim); font-size: var(--step--1); }
   .calibrated a { color: var(--brass); display: inline-block; padding: 0.6rem 0; }

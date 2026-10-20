@@ -1,4 +1,4 @@
-import { nameChord, type ChordGuess } from './chordName';
+import { nameChord, type ChordGuess, type NameOptions } from './chordName';
 
 /** A chord that was held long enough to count, for the history (and later, improv analysis). */
 export interface ChordEvent {
@@ -25,8 +25,14 @@ export class ChordTracker {
   private pendingNotes: number[] = [];
   private lastSymbol: string | null = null;
 
-  /** @param settleMs how long the same notes must sound before they count as a chord */
-  constructor(private settleMs = 80) {}
+  /**
+   * @param settleMs how long the same notes must sound before they count as a chord
+   * @param naming how chords are named (e.g. whether the lowest note decides the bass)
+   */
+  constructor(
+    private settleMs = 80,
+    private naming: NameOptions = {},
+  ) {}
 
   update(time: number, notes: number[]): TrackerUpdate {
     const key = notes.join(',');
@@ -35,7 +41,7 @@ export class ChordTracker {
       this.pendingSince = time;
       this.pendingNotes = notes;
     }
-    const current = nameChord(notes, 8);
+    const current = nameChord(notes, 8, this.naming);
     let changed: ChordEvent | null = null;
     const best = current[0];
     if (best && time - this.pendingSince >= this.settleMs && best.symbol !== this.lastSymbol) {

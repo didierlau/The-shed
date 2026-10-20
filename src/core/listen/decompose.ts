@@ -39,6 +39,16 @@ export interface DecomposeOptions {
    * low "ghost" note from explaining two real notes that happen to be its overtones.
    */
   fundamentalEvidence?: number;
+  /**
+   * A note below all the others is only kept if it's at least this loud compared
+   * with the typical note above it; quieter ones are taken as resonance.
+   */
+  undertoneRatio?: number;
+  /**
+   * The lowest note is kept only if leaving it out makes the fit worse by at least
+   * this share of its own contribution, i.e. it explains sound no other note does.
+   */
+  uniqueShare?: number;
 }
 
 const DEFAULTS: Required<DecomposeOptions> = {
@@ -47,6 +57,8 @@ const DEFAULTS: Required<DecomposeOptions> = {
   relativeThreshold: 0.3,
   maxNotes: 8,
   fundamentalEvidence: 0.3,
+  undertoneRatio: 0.3,
+  uniqueShare: 0.35,
 };
 
 /** Without calibration, a note must be louder relative to the rest to count. */
@@ -136,17 +148,47 @@ export function decompose(x: SemitoneVector, dict: NoteDictionary, options: Deco
     const h = noteWeights(x, dict, o, allowed);
     const max = Math.max(0, ...h);
     if (max < 0.05) return [];
-    const candidates = dict.notes.map((note, i) => ({ note, i, w: h[i]! }));
-    const kept = candidates
+    const all = dict.notes.map((note, i) => ({ note, i, w: h[i]! }));
+    const kept = all
       .filter((e) => e.w >= o.relativeThreshold * max)
       .sort((a, b) => b.w - a.w)
       .slice(0, o.maxNotes);
-    // Phone mics hear bass quietly, so a note below everything else gets half the bar.
-    const lowestKept = Math.min(...kept.map((e) => e.note));
-    const bass = candidates
-      .filter((e) => e.note < lowestKept && e.w >= (o.relativeThreshold / 2) * max)
-      .sort((a, b) => b.w - a.w)[0];
-    if (bass && kept.length < o.maxNotes) kept.push(bass);
+
+    // The bass is judged against the notes above it, not against the loudest note:
+    // - a note below the chord is kept if it's at least `undertoneRatio` as loud as the
+    //   typical chord note, even if it's under the general threshold (phone mics hear
+    //   bass quietly; a softly played bass still counts);
+    // - anything quieter is an undertone: a low string resonating along (especially with
+    //   the pedal down). Real sound, but not played, and it mustn't pose as the bass.
+    // Weights are relative to each key's own recording, so this compares like with like.
+    const typical = (notes: { w: number }[]) => {
+      const ws = notes.map((e) => e.w).sort((a, b) => a - b);
+      return ws[Math.floor(ws.length / 2)] ?? 0;
+    };
+    const byPitch = [...kept].sort((a, b) => a.note - b.note);
+    while (byPitch.length >= 3 && byPitch[0]!.w < o.undertoneRatio * typical(byPitch.slice(1))) {
+      kept.splice(kept.indexOf(byPitch.shift()!), 1);
+    }
+    if (kept.length >= 2) {
+      const lowest = Math.min(...kept.map((e) => e.note));
+      const bar = o.undertoneRatio * typical(kept);
+      for (const e of all) if (e.note < lowest && e.w >= bar && kept.length < o.maxNotes) kept.push(e);
+    }
+
+    // Is the lowest note needed? An undertone sits an octave or two below notes that were
+    // played, so its overtones coincide with theirs: leave it out and the rest explain the
+    // sound almost as well. A played bass brings overtones nobody else explains.
+    while (kept.length >= 3) {
+      const low = kept.reduce((a, b) => (b.note < a.note ? b : a));
+      const without = kept.filter((e) => e !== low).map((e) => e.i);
+      // Size of what this note contributes, in the same (squared) units as the fit error.
+      const p = prepare(dict).power[low.i]!;
+      let contribution = 0;
+      for (let n = 0; n < VEC_SIZE; n++) contribution += (low.w * low.w * p[n]!) ** 2;
+      const gain = residualPower(x, dict, without) - residualPower(x, dict, [...without, low.i]);
+      if (gain >= o.uniqueShare * contribution) break;
+      kept.splice(kept.indexOf(low), 1);
+    }
 
     // Evidence check: is each note's own fundamental there, as strongly as its template says,
     // beyond what the other notes' overtones already put at that pitch?
@@ -162,6 +204,25 @@ export function decompose(x: SemitoneVector, dict: NoteDictionary, options: Deco
     allowed[ghosts.sort((a, b) => b.w - a.w)[0]!.i] = false;
   }
   return [];
+}
+
+/**
+ * How much of the sound (as a share of its power) is left unexplained when only the
+ * given notes may be used, each at its best-fitting loudness.
+ */
+function residualPower(x: SemitoneVector, dict: NoteDictionary, notes: number[]): number {
+  const allowed = dict.notes.map(() => false);
+  for (const i of notes) allowed[i] = true;
+  const h = noteWeights(x, dict, { sparsity: 0 }, allowed);
+  const { power } = prepare(dict);
+  const scale = norm(x) ** 2;
+  let r = 0;
+  for (let n = 0; n < VEC_SIZE; n++) {
+    let model = 0;
+    for (const i of notes) model += h[i]! ** 2 * power[i]![n]!;
+    r += (x[n]! ** 2 / scale - model) ** 2;
+  }
+  return r;
 }
 
 /**

@@ -58,6 +58,17 @@ describe('nameChord', () => {
     expect(alts).not.toContain('Dm');
   });
 
+  it('can name by the notes alone, ignoring an untrustworthy lowest note', () => {
+    const noBass = (notes: string) => nameChord(m(notes), 3, { useBass: false })[0]?.symbol;
+    // A stray low E (resonance, or a note heard an octave too low) no longer makes Fmaj7/E.
+    expect(best('E2 F3 A3 C4 E4')).toBe('Fmaj7/E');
+    expect(noBass('E2 F3 A3 C4 E4')).toBe('Fmaj7');
+    expect(noBass('G2 C3 E3 G3 B3')).toBe('Cmaj7');
+    // Same notes as F6: without a bass, the common jazz reading wins.
+    expect(noBass('F2 A2 C3 D3')).toBe('Dm7');
+    expect(noBass('A2 C#3 G3 B3 E4')).toBe('A9');
+  });
+
   it('needs three different notes', () => {
     expect(nameChord([])).toEqual([]);
     expect(nameChord(m('C3 C4 G4'))).toEqual([]);

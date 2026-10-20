@@ -26,9 +26,13 @@ function realPianoNote(midi: number): SemitoneVector {
   return v;
 }
 
-function mix(notes: number[], seed = 1, noise = 0.01): SemitoneVector {
+function mix(notes: number[], seed = 1, noise = 0.01, quiet: { note: number; level: number }[] = []): SemitoneVector {
   const rng = seededRng(seed);
   const power = new Float64Array(VEC_SIZE);
+  for (const { note, level } of quiet) {
+    const v = realPianoNote(note);
+    for (let k = 0; k < VEC_SIZE; k++) power[k]! += (v[k]! * level) ** 2;
+  }
   for (const n of notes) {
     const v = realPianoNote(n);
     const vel = 0.6 + 0.4 * rng();
@@ -69,6 +73,21 @@ describe('decompose with a calibrated piano', () => {
 
   it('finds single melody notes without their overtones', () => {
     for (const n of m('C2 G2 C3 A3 E4 B4 F#5')) expect(decompose(mix([n], n), dict)).toEqual([n]);
+  });
+
+  it('ignores low strings resonating along with the chord (undertones)', () => {
+    // Dm7 played; the open D2 and F2 strings ring along softly, as with the pedal down.
+    const resonance = [
+      { note: Note.midi('D2')!, level: 0.2 },
+      { note: Note.midi('F2')!, level: 0.15 },
+    ];
+    expect(decompose(mix(m('D3 F3 A3 C4'), 3, 0.01, resonance), dict)).toEqual(m('D3 F3 A3 C4'));
+    expect(decompose(mix(m('C3 E3 G3 B3'), 4, 0.01, [{ note: Note.midi('C2')!, level: 0.2 }]), dict)).toEqual(m('C3 E3 G3 B3'));
+  });
+
+  it('keeps a bass note that is actually played', () => {
+    expect(decompose(mix(m('D2 F3 A3 C4 E4'), 5), dict)).toEqual(m('D2 F3 A3 C4 E4'));
+    expect(decompose(mix(m('G2 F3 B3 E4'), 6), dict)).toEqual(m('G2 F3 B3 E4'));
   });
 
   it('copes with a noisy room', () => {
