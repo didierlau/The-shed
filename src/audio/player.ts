@@ -14,6 +14,13 @@ export interface Player {
   readonly source: 'piano' | 'synth' | 'loading';
 }
 
+/**
+ * The piano samples are only downloaded for this loudness range. smplr stays
+ * silent for a velocity it has no samples for, so every note is kept inside it.
+ */
+const LOADED_VELOCITY = { low: 70, high: 90 };
+const clampVelocity = (v: number) => Math.min(LOADED_VELOCITY.high, Math.max(LOADED_VELOCITY.low, v));
+
 type Instrument = { start(e: { note: string; time: number; duration: number; velocity?: number }): StopFn };
 
 class WebAudioPlayer implements Player {
@@ -34,7 +41,7 @@ class WebAudioPlayer implements Player {
       // Load every third note from A1 to C7 (the widest range setting) at one velocity
       // layer, to keep the download small; notes in between are pitch-shifted from the nearest sample.
       const piano = new SplendidGrandPiano(ctx, {
-        notesToLoad: { notes: range(33, 96).filter((m) => m % 3 === 0), velocityRange: [70, 90] },
+        notesToLoad: { notes: range(33, 96).filter((m) => m % 3 === 0), velocityRange: [LOADED_VELOCITY.low, LOADED_VELOCITY.high] },
       });
       await Promise.race([piano.ready, timeout(15000)]);
       this.piano = piano;
@@ -56,7 +63,7 @@ class WebAudioPlayer implements Player {
     let t = ctx.currentTime + 0.05;
     const sound = (note: string, start: number, length: number, velocity = 80) => {
       if (this.piano) {
-        const stop = this.piano.start({ note, time: start, duration: length + 0.6, velocity });
+        const stop = this.piano.start({ note, time: start, duration: length + 0.6, velocity: clampVelocity(velocity) });
         this.active.push({ stop: () => stop() });
       } else {
         this.active.push(synthNote(ctx, note, start, length));
@@ -65,8 +72,8 @@ class WebAudioPlayer implements Player {
     for (const step of steps) {
       const duration = step.beats * beat;
       for (const note of step.notes) sound(note, t, duration);
-      // Held notes (a drone) ring on, a little softer than the melody over them.
-      for (const note of step.held?.notes ?? []) sound(note, t, step.held!.beats * beat, 60);
+      // Held notes (a drone) ring on, as soft as the loaded samples allow.
+      for (const note of step.held?.notes ?? []) sound(note, t, step.held!.beats * beat, LOADED_VELOCITY.low);
       t += duration;
     }
     await wait((t - ctx.currentTime) * 1000);
