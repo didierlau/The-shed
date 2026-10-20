@@ -4,6 +4,7 @@ import type { ChordDrillConfig } from './chords';
 import type { DegreeDrillConfig, FunctionDrillConfig } from './functional';
 import type { ProgressionDrillConfig } from './progressions';
 import type { VoicingDrillConfig } from './voicings';
+import type { ScaleDrillConfig } from './scales';
 import { MAJOR_KEYS } from '../keys';
 
 /**
@@ -16,7 +17,8 @@ export type DrillConfig =
   | DegreeDrillConfig
   | FunctionDrillConfig
   | ProgressionDrillConfig
-  | VoicingDrillConfig;
+  | VoicingDrillConfig
+  | ScaleDrillConfig;
 
 const EASY_KEYS = ['C', 'F', 'Bb', 'G'] as const;
 
@@ -279,6 +281,65 @@ export const DRILLS: DrillConfig[] = [
     voicings: ['close', 'shell', 'drop2', 'rootlessA', 'rootlessB', 'soWhat', 'upperStructure'],
     qualities: ['maj7', 'm7', '7', 'm7b5'],
   },
+  {
+    kind: 'scales',
+    id: 'scales-ii-v-i',
+    title: 'The ii\u2060–\u2060V\u2060–\u2060I scales',
+    description: 'Dorian, Mixolydian and major: what you play over each chord.',
+    scales: ['dorian', 'mixolydian', 'major'],
+    direction: 'up',
+    drone: true,
+  },
+  {
+    kind: 'scales',
+    id: 'scales-modes',
+    title: 'All seven modes',
+    description: 'Ionian to Locrian, each over its root.',
+    scales: ['major', 'dorian', 'phrygian', 'lydian', 'mixolydian', 'aeolian', 'locrian'],
+    direction: 'up',
+    drone: true,
+  },
+  {
+    kind: 'scales',
+    id: 'scales-minor',
+    title: 'Minor colours',
+    description: 'Dorian, natural, harmonic and melodic minor.',
+    scales: ['dorian', 'aeolian', 'harmonic minor', 'melodic minor'],
+    direction: 'updown',
+    drone: true,
+  },
+  {
+    kind: 'scales',
+    id: 'scales-dominant',
+    title: 'Dominant sounds',
+    description: 'Mixolydian, Lydian dominant, altered, diminished, whole tone.',
+    scales: ['mixolydian', 'lydian dominant', 'altered', 'half-whole diminished', 'whole tone', 'phrygian dominant'],
+    direction: 'up',
+    drone: true,
+  },
+  {
+    kind: 'scales',
+    id: 'scales-blues-bebop',
+    title: 'Pentatonics, blues and bebop',
+    description: 'The vocabulary scales: five-note, blues, and the eight-note bebop scales.',
+    scales: ['major pentatonic', 'minor pentatonic', 'blues', 'bebop', 'bebop major'],
+    direction: 'updown',
+    drone: true,
+  },
+  {
+    kind: 'scales',
+    id: 'scales-all',
+    title: 'All scales',
+    description: 'Every scale, without a drone. Adaptive to your weak spots.',
+    scales: [
+      'major', 'dorian', 'phrygian', 'lydian', 'mixolydian', 'aeolian', 'locrian',
+      'melodic minor', 'harmonic minor', 'locrian #2', 'lydian dominant', 'altered', 'phrygian dominant',
+      'half-whole diminished', 'diminished', 'whole tone',
+      'major pentatonic', 'minor pentatonic', 'blues', 'bebop', 'bebop major',
+    ],
+    direction: 'updown',
+    drone: false,
+  },
 ];
 
 /** Home-screen sections, in order. Each lists the drill kinds it shows. */
@@ -299,6 +360,7 @@ export const DRILL_GROUPS: DrillGroup[] = [
     kinds: ['degrees', 'functions'],
   },
   { id: 'progressions', title: 'Progressions', description: 'ii\u2060–\u2060Vs, turnarounds and reharmonisations.', kinds: ['progressions'] },
+  { id: 'scales', title: 'Scales', description: 'Modes, minor colours, dominant scales, bebop.', kinds: ['scales'] },
   { id: 'voicings', title: 'Jazz voicings', description: 'Shells, drop-2, rootless, So What.', kinds: ['voicings'] },
 ];
 

@@ -4,6 +4,7 @@ import { DEGREES, FUNCTIONS, MAJOR_KEYS, type Degree, type HarmonicFunction } fr
 import { PROGRESSIONS, type ProgressionName } from '../progressions';
 import type { Choice } from '../types';
 import { VOICINGS, type VoicingType } from '../voicings';
+import { SCALE_ORDER, SCALES, type ScaleName } from '../scales';
 import type { IntervalDirection } from './intervals';
 import type { DrillConfig } from './catalog';
 
@@ -126,6 +127,34 @@ export const CUSTOM_SPECS: Record<DrillKind, CustomSpec> = {
     defaultItems: ['ii-V-I', 'ii-V-i'],
     options: [KEYS_OPTION],
   },
+  scales: {
+    kind: 'scales',
+    noun: 'scales',
+    items: entries(SCALE_ORDER, SCALES),
+    defaultItems: ['dorian', 'mixolydian', 'major'],
+    options: [
+      {
+        id: 'direction',
+        label: 'Played',
+        choices: [
+          { value: 'up', label: 'Up' },
+          { value: 'updown', label: 'Up and down' },
+        ],
+        multi: false,
+        default: ['up'],
+      },
+      {
+        id: 'drone',
+        label: 'Root underneath',
+        choices: [
+          { value: 'on', label: 'Hold the root' },
+          { value: 'off', label: 'Scale only' },
+        ],
+        multi: false,
+        default: ['on'],
+      },
+    ],
+  },
   voicings: {
     kind: 'voicings',
     noun: 'voicings',
@@ -206,5 +235,13 @@ export function buildCustomDrill(kind: DrillKind, raw: Partial<CustomSelection> 
       return { ...base, kind, progressions: sel.items as ProgressionName[], keys };
     case 'voicings':
       return { ...base, kind, voicings: sel.items as VoicingType[], qualities: ['maj7', 'm7', '7', 'm7b5'] };
+    case 'scales':
+      return {
+        ...base,
+        kind,
+        scales: sel.items as ScaleName[],
+        direction: sel.options.direction![0] === 'updown' ? 'updown' : 'up',
+        drone: sel.options.drone![0] !== 'off',
+      };
   }
 }

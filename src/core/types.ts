@@ -13,6 +13,8 @@ export interface PlaybackStep {
   /** Scientific pitch notation, e.g. "C4", "F#3". */
   notes: string[];
   beats: number;
+  /** Extra notes struck with this step that keep sounding longer, e.g. a drone under a scale. */
+  held?: { notes: string[]; beats: number };
 }
 
 export interface Choice {

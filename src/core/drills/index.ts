@@ -7,6 +7,7 @@ import { generateChordQuestion } from './chords';
 import { generateDegreeQuestion, generateFunctionQuestion } from './functional';
 import { generateProgressionQuestion } from './progressions';
 import { generateVoicingQuestion } from './voicings';
+import { generateScaleQuestion } from './scales';
 
 export { DRILLS, DRILL_GROUPS, findDrill, findGroup, groupOfKind, type DrillConfig, type DrillGroup } from './catalog';
 export {
@@ -24,7 +25,7 @@ export {
 /**
  * Single entry point the UI uses to get a question for any drill.
  * When a new drill kind is added, add a case here — the UI stays unchanged.
- * The note range applies to intervals, chord qualities and scale degrees;
+ * The note range applies to intervals, chord qualities, scale degrees and scales;
  * functions, progressions and voicings stay in their comping register.
  */
 export function generateQuestion(
@@ -46,5 +47,7 @@ export function generateQuestion(
       return generateProgressionQuestion(config, rng, stats);
     case 'voicings':
       return generateVoicingQuestion(config, rng, stats);
+    case 'scales':
+      return generateScaleQuestion(config, rng, stats, settings.range);
   }
 }

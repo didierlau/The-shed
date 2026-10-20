@@ -30,7 +30,7 @@
 
 <h2>Note range</h2>
 <p class="lede">
-  Where intervals, chord qualities and scale degrees are played. Progressions, chord functions and voicings stay in
+  Where intervals, chord qualities, scale degrees and scales are played. Progressions, chord functions and voicings stay in
   their usual comping register.
 </p>
 

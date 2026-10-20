@@ -53,17 +53,18 @@ Add an entry to `src/core/drills/catalog.ts`. No other change needed.
 3. ~~Functional hearing~~ (scale degrees and diatonic chords against a ii–V–I)
 4. ~~Progressions~~ (ii–V–Is, turnarounds, reharmonisations, standards building blocks)
 5. ~~Jazz voicings~~ (close, shell, drop-2, rootless A/B, So What, upper structures)
-6. ~~Listen: live chord naming~~ from a MIDI piano or the microphone
+6. ~~Scales~~ (modes, minor colours, dominant scales, pentatonics, blues, bebop)
+7. ~~Listen: live chord naming~~ from a MIDI piano or the microphone
    - mic: each strike is matched against the user's own piano, recorded once in a
      guided calibration (quick C3–C5 or full C2–C6); a note only counts if its own
      fundamental is there, which stops low "ghost" notes
-7. Improvisation evaluator, building on Listen:
+8. Improvisation evaluator, building on Listen:
    - record a take (`ChordEvent`s plus every note with its time)
    - enter or pick the tune's changes, so each note has a chord context
    - per chord, find the scale(s) the notes fit (Dorian, Mixolydian, altered, bebop…)
      and whether that scale suits the chord and the tune's key
    - show where the line left the changes, and how often it landed on guide tones
-8. Offline support (service worker) and Play Store wrapper (Capacitor)
+9. Offline support (service worker) and Play Store wrapper (Capacitor)
 
 ## Tech
 

@@ -54,16 +54,19 @@ class WebAudioPlayer implements Player {
 
     const beat = 60 / (opts.tempo ?? 80);
     let t = ctx.currentTime + 0.05;
+    const sound = (note: string, start: number, length: number, velocity = 80) => {
+      if (this.piano) {
+        const stop = this.piano.start({ note, time: start, duration: length + 0.6, velocity });
+        this.active.push({ stop: () => stop() });
+      } else {
+        this.active.push(synthNote(ctx, note, start, length));
+      }
+    };
     for (const step of steps) {
       const duration = step.beats * beat;
-      for (const note of step.notes) {
-        if (this.piano) {
-          const stop = this.piano.start({ note, time: t, duration: duration + 0.6, velocity: 80 });
-          this.active.push({ stop: () => stop() });
-        } else {
-          this.active.push(synthNote(ctx, note, t, duration));
-        }
-      }
+      for (const note of step.notes) sound(note, t, duration);
+      // Held notes (a drone) ring on, a little softer than the melody over them.
+      for (const note of step.held?.notes ?? []) sound(note, t, step.held!.beats * beat, 60);
       t += duration;
     }
     await wait((t - ctx.currentTime) * 1000);
