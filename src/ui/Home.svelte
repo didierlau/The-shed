@@ -21,11 +21,11 @@
   <p>Ear training for jazz musicians. Pick a drill and start shedding.</p>
 </header>
 
-{#each DRILL_GROUPS as group (group.kind)}
-  <section aria-labelledby={`group-${group.kind}`}>
-    <h2 id={`group-${group.kind}`}>{group.title}</h2>
+{#each DRILL_GROUPS as group (group.title)}
+  <section aria-labelledby={`group-${group.kinds[0]}`}>
+    <h2 id={`group-${group.kinds[0]}`}>{group.title}</h2>
     <ul>
-      {#each DRILLS.filter((d) => d.kind === group.kind) as drill (drill.id)}
+      {#each DRILLS.filter((d) => group.kinds.includes(d.kind)) as drill (drill.id)}
         <li>
           <a href={`#/drill/${drill.id}`}>
             <span class="title">{drill.title}</span>
@@ -38,7 +38,7 @@
   </section>
 {/each}
 
-<footer>Functional hearing, progressions and voicings are next.</footer>
+<footer>Progressions and voicings are next.</footer>
 
 <style>
   header { margin: 1.5rem 0 2.25rem; }

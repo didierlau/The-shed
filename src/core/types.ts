@@ -32,4 +32,6 @@ export interface Question {
   answer: string;
   /** Short description of what was played, revealed after answering. */
   reveal: string;
+  /** Optional sound played right after answering, e.g. a degree resolving to the tonic. */
+  resolution?: PlaybackStep[];
 }

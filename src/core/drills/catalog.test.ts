@@ -17,7 +17,7 @@ describe('drill catalog', () => {
   });
 
   it('shows every drill kind on the home screen', () => {
-    const kinds = new Set(DRILL_GROUPS.map((g) => g.kind));
+    const kinds = new Set(DRILL_GROUPS.flatMap((g) => g.kinds));
     for (const d of DRILLS) expect(kinds).toContain(d.kind);
   });
 

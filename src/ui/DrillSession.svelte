@@ -17,20 +17,26 @@
   const answered = $derived(picked !== null);
   const wasRight = $derived(answered && picked === question?.answer);
 
-  async function play() {
-    if (!question || playing) return;
+  // Each playback gets a ticket so a newer sound (e.g. a resolution) can cut off an older one.
+  let ticket = 0;
+  async function playSteps(steps: Question['playback']) {
+    const mine = ++ticket;
     playing = true;
     try {
-      await player.play(question.playback);
+      await player.play(steps);
     } finally {
-      playing = false;
+      if (mine === ticket) playing = false;
     }
+  }
+
+  function play() {
+    if (question && !playing) void playSteps(question.playback);
   }
 
   async function next() {
     question = generateQuestion(drill, Math.random, stats);
     picked = null;
-    await play();
+    await playSteps(question.playback);
   }
 
   function answer(value: string) {
@@ -47,6 +53,7 @@
       drills: { ...progress.drills, [drill.id]: recordAnswer(stats, question.answer, correct) },
     };
     saveProgress(progress);
+    if (question.resolution) void playSteps(question.resolution);
   }
 
   function reset() {
@@ -84,7 +91,7 @@
 </div>
 
 {#if question}
-  <div class="choices" role="group" aria-label="Your answer">
+  <div class="choices" class:compact={question.choices.length > 6} role="group" aria-label="Your answer">
     {#each question.choices as c (c.value)}
       <button class={choiceState(c.value)} onclick={() => answer(c.value)} disabled={answered}>
         {c.label}
@@ -182,6 +189,7 @@
     grid-template-columns: repeat(auto-fill, minmax(8.5rem, 1fr));
     gap: 0.5rem;
   }
+  .choices.compact { grid-template-columns: repeat(auto-fill, minmax(4.75rem, 1fr)); }
   .choices button {
     min-height: 3.25rem;
     padding: 0.5rem;

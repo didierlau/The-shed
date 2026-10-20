@@ -1,16 +1,20 @@
 import { ALL_INTERVALS } from '../intervals';
 import type { IntervalDrillConfig } from './intervals';
 import type { ChordDrillConfig } from './chords';
+import type { DegreeDrillConfig, FunctionDrillConfig } from './functional';
+import { MAJOR_KEYS } from '../keys';
 
 /**
  * All drills in the app, in suggested order.
  * Adding a level = adding an entry here. Future drill kinds
- * (functional notes, progressions, voicings) join this union.
+ * (progressions, voicings) join this union.
  */
-export type DrillConfig = IntervalDrillConfig | ChordDrillConfig;
+export type DrillConfig = IntervalDrillConfig | ChordDrillConfig | DegreeDrillConfig | FunctionDrillConfig;
 
 const RANGE: [string, string] = ['C3', 'C5'];
 const ROOTS: [string, string] = ['C3', 'G3'];
+const MELODY: [string, string] = ['A3', 'A4'];
+const EASY_KEYS = ['C', 'F', 'Bb', 'G'] as const;
 
 export const DRILLS: DrillConfig[] = [
   {
@@ -91,7 +95,7 @@ export const DRILLS: DrillConfig[] = [
     kind: 'chords',
     id: 'chords-sevenths-core',
     title: 'The big three 7ths',
-    description: 'Maj7, dominant 7 and m7 — the chords of the ii–V–I.',
+    description: 'Maj7, dominant 7 and m7 — the chords of the ii\u2060–\u2060V\u2060–\u2060I.',
     qualities: ['maj7', '7', 'm7'],
     voicing: 'close',
     playback: 'arpeggio',
@@ -100,7 +104,7 @@ export const DRILLS: DrillConfig[] = [
   {
     kind: 'chords',
     id: 'chords-sevenths-minor-ii-v',
-    title: 'Minor ii–V colours',
+    title: 'Minor ii\u2060–\u2060V colours',
     description: 'Add half-diminished and diminished 7 to the big three.',
     qualities: ['maj7', '7', 'm7', 'm7b5', 'dim7'],
     voicing: 'close',
@@ -137,12 +141,82 @@ export const DRILLS: DrillConfig[] = [
     playback: 'block',
     rootRange: ROOTS,
   },
+  {
+    kind: 'degrees',
+    id: 'degrees-triad',
+    title: '1, 3 and 5',
+    description: 'Hear the tonic triad notes against a ii\u2060–\u2060V\u2060–\u2060I.',
+    degrees: ['1', '3', '5'],
+    keys: EASY_KEYS,
+    range: MELODY,
+  },
+  {
+    kind: 'degrees',
+    id: 'degrees-lower',
+    title: '1 to 5',
+    description: 'Add 2 and 4: the lower half of the scale.',
+    degrees: ['1', '2', '3', '4', '5'],
+    keys: EASY_KEYS,
+    range: MELODY,
+  },
+  {
+    kind: 'degrees',
+    id: 'degrees-major',
+    title: 'The whole major scale',
+    description: 'All seven degrees, in every key.',
+    degrees: ['1', '2', '3', '4', '5', '6', '7'],
+    keys: MAJOR_KEYS,
+    range: MELODY,
+  },
+  {
+    kind: 'degrees',
+    id: 'degrees-blue',
+    title: 'Blue notes',
+    description: '♭3, ♭5 and ♭7 against the major sound — the blues inside jazz.',
+    degrees: ['1', 'b3', '3', 'b5', '5', '6', 'b7'],
+    keys: MAJOR_KEYS,
+    range: MELODY,
+  },
+  {
+    kind: 'degrees',
+    id: 'degrees-chromatic',
+    title: 'All twelve degrees',
+    description: 'Every chromatic note in every key. Adaptive to your weak spots.',
+    degrees: ['1', 'b2', '2', 'b3', '3', '4', 'b5', '5', 'b6', '6', 'b7', '7'],
+    keys: MAJOR_KEYS,
+    range: MELODY,
+  },
+  {
+    kind: 'functions',
+    id: 'functions-primary',
+    title: 'I, IV and V',
+    description: 'Home, away and tension — the three pillars.',
+    functions: ['I', 'IV', 'V'],
+    keys: EASY_KEYS,
+  },
+  {
+    kind: 'functions',
+    id: 'functions-ii-v-vi',
+    title: 'Add ii and vi',
+    description: 'The chords of the turnaround: I\u2060–\u2060vi\u2060–\u2060ii\u2060–\u2060V.',
+    functions: ['I', 'ii', 'IV', 'V', 'vi'],
+    keys: EASY_KEYS,
+  },
+  {
+    kind: 'functions',
+    id: 'functions-all',
+    title: 'All diatonic 7th chords',
+    description: 'Every chord of the major key, in every key.',
+    functions: ['I', 'ii', 'iii', 'IV', 'V', 'vi', 'vii'],
+    keys: MAJOR_KEYS,
+  },
 ];
 
-/** Home-screen sections, in order. */
-export const DRILL_GROUPS: { kind: DrillConfig['kind']; title: string }[] = [
-  { kind: 'intervals', title: 'Intervals' },
-  { kind: 'chords', title: 'Chord qualities' },
+/** Home-screen sections, in order. Each lists the drill kinds it shows. */
+export const DRILL_GROUPS: { kinds: DrillConfig['kind'][]; title: string }[] = [
+  { kinds: ['intervals'], title: 'Intervals' },
+  { kinds: ['chords'], title: 'Chord qualities' },
+  { kinds: ['degrees', 'functions'], title: 'Functional hearing' },
 ];
 
 export function findDrill(id: string): DrillConfig | undefined {
