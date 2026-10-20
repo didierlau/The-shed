@@ -2,8 +2,9 @@ import type { StatsTable } from '../stats';
 import type { Question, Rng } from '../types';
 import type { DrillConfig } from './catalog';
 import { generateIntervalQuestion } from './intervals';
+import { generateChordQuestion } from './chords';
 
-export { DRILLS, findDrill, type DrillConfig } from './catalog';
+export { DRILLS, DRILL_GROUPS, findDrill, type DrillConfig } from './catalog';
 
 /**
  * Single entry point the UI uses to get a question for any drill.
@@ -13,5 +14,7 @@ export function generateQuestion(config: DrillConfig, rng: Rng, stats?: StatsTab
   switch (config.kind) {
     case 'intervals':
       return generateIntervalQuestion(config, rng, stats);
+    case 'chords':
+      return generateChordQuestion(config, rng, stats);
   }
 }

@@ -25,6 +25,8 @@ export interface Choice {
 /** A single question produced by a drill. The UI shows it, the audio layer plays it. */
 export interface Question {
   playback: PlaybackStep[];
+  /** Instruction shown while waiting for an answer, e.g. "Name the interval you hear." */
+  prompt: string;
   choices: Choice[];
   /** The `value` of the correct choice. */
   answer: string;

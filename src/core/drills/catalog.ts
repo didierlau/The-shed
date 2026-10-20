@@ -1,14 +1,16 @@
 import { ALL_INTERVALS } from '../intervals';
 import type { IntervalDrillConfig } from './intervals';
+import type { ChordDrillConfig } from './chords';
 
 /**
  * All drills in the app, in suggested order.
  * Adding a level = adding an entry here. Future drill kinds
- * (chord qualities, functional notes, progressions, voicings) join this union.
+ * (functional notes, progressions, voicings) join this union.
  */
-export type DrillConfig = IntervalDrillConfig;
+export type DrillConfig = IntervalDrillConfig | ChordDrillConfig;
 
 const RANGE: [string, string] = ['C3', 'C5'];
+const ROOTS: [string, string] = ['C3', 'G3'];
 
 export const DRILLS: DrillConfig[] = [
   {
@@ -65,6 +67,82 @@ export const DRILLS: DrillConfig[] = [
     directions: ['up', 'down', 'harmonic'],
     range: RANGE,
   },
+  {
+    kind: 'chords',
+    id: 'chords-triads-basic',
+    title: 'Major & minor triads',
+    description: 'The first colour choice: bright or dark.',
+    qualities: ['M', 'm'],
+    voicing: 'close',
+    playback: 'arpeggio',
+    rootRange: ROOTS,
+  },
+  {
+    kind: 'chords',
+    id: 'chords-triads-all',
+    title: 'All triads',
+    description: 'Major, minor, diminished and augmented.',
+    qualities: ['M', 'm', 'dim', 'aug'],
+    voicing: 'close',
+    playback: 'arpeggio',
+    rootRange: ROOTS,
+  },
+  {
+    kind: 'chords',
+    id: 'chords-sevenths-core',
+    title: 'The big three 7ths',
+    description: 'Maj7, dominant 7 and m7 — the chords of the ii–V–I.',
+    qualities: ['maj7', '7', 'm7'],
+    voicing: 'close',
+    playback: 'arpeggio',
+    rootRange: ROOTS,
+  },
+  {
+    kind: 'chords',
+    id: 'chords-sevenths-minor-ii-v',
+    title: 'Minor ii–V colours',
+    description: 'Add half-diminished and diminished 7 to the big three.',
+    qualities: ['maj7', '7', 'm7', 'm7b5', 'dim7'],
+    voicing: 'close',
+    playback: 'arpeggio',
+    rootRange: ROOTS,
+  },
+  {
+    kind: 'chords',
+    id: 'chords-sixths',
+    title: '6ths & minor-major',
+    description: 'Tonic colours: 6, m6 and mMaj7 against maj7 and m7.',
+    qualities: ['6', 'm6', 'mMaj7', 'maj7', 'm7'],
+    voicing: 'close',
+    playback: 'block',
+    rootRange: ROOTS,
+  },
+  {
+    kind: 'chords',
+    id: 'chords-shells',
+    title: 'Shell voicings',
+    description: 'Root, 3rd and 7th only — how they sound when you comp.',
+    qualities: ['maj7', '7', 'm7', '6', '7sus4'],
+    voicing: 'shell',
+    playback: 'block',
+    rootRange: ROOTS,
+  },
+  {
+    kind: 'chords',
+    id: 'chords-all',
+    title: 'All chord qualities',
+    description: 'Every 7th and 6th chord, played together. Adaptive to your weak spots.',
+    qualities: ['maj7', '7', 'm7', 'm7b5', 'dim7', 'mMaj7', '6', 'm6', '7sus4'],
+    voicing: 'close',
+    playback: 'block',
+    rootRange: ROOTS,
+  },
+];
+
+/** Home-screen sections, in order. */
+export const DRILL_GROUPS: { kind: DrillConfig['kind']; title: string }[] = [
+  { kind: 'intervals', title: 'Intervals' },
+  { kind: 'chords', title: 'Chord qualities' },
 ];
 
 export function findDrill(id: string): DrillConfig | undefined {

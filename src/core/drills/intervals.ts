@@ -59,6 +59,7 @@ export function generateIntervalQuestion(
 
   return {
     playback,
+    prompt: 'Name the interval you hear.',
     choices: config.intervals.map((value) => ({ value, label: INTERVALS[value].label })),
     answer: interval,
     reveal: `${INTERVALS[interval].label}: ${first} ${arrow} ${second}`,

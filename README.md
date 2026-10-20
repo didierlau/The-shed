@@ -34,17 +34,17 @@ The rule that keeps this maintainable: **dependencies only point inwards.**
 
 Add an entry to `src/core/drills/catalog.ts`. No other change needed.
 
-### Adding a new kind of drill (e.g. chord qualities)
+### Adding a new kind of drill (e.g. functional hearing)
 
-1. Create `src/core/drills/chords.ts` with a config type and a `generate…Question()` that returns a `Question`.
-2. Add tests next to it (`chords.test.ts`).
-3. Add the config type to the `DrillConfig` union in `catalog.ts` and a `case` in `drills/index.ts`.
+1. Create `src/core/drills/<kind>.ts` with a config type and a `generate…Question()` that returns a `Question`.
+2. Add tests next to it (`<kind>.test.ts`).
+3. Add the config type to the `DrillConfig` union in `catalog.ts` , a `case` in `drills/index.ts`, and a group in `DRILL_GROUPS`.
 4. Add levels to `DRILLS`. The UI picks them up automatically.
 
 ## Roadmap
 
 1. ~~Intervals~~
-2. Chord qualities (maj7, m7, 7, m7b5, dim7, 7alt…)
+2. ~~Chord qualities~~ (triads, 7ths, 6ths, shells)
 3. Functional hearing: notes and chords in a key
 4. Progressions: ii–V–I, turnarounds, rhythm changes
 5. Jazz voicings: shells, drop-2, rootless, upper structures

@@ -99,7 +99,7 @@
       </p>
       <button class="primary" onclick={next}>Next question</button>
     {:else}
-      <p class="hint">Name the interval you hear.</p>
+      <p class="hint">{question.prompt}</p>
     {/if}
   </div>
 
@@ -139,31 +139,42 @@
 
   /* The one bold element: a brass record you tap to hear the question. */
   .disc {
+    position: relative;
     width: 9.5rem;
     aspect-ratio: 1;
     border-radius: 50%;
     border: 0;
-    display: grid;
-    place-items: center;
-    background:
-      radial-gradient(circle, var(--navy) 0 9%, transparent 9.5%),
-      radial-gradient(circle, var(--brass) 0 34%, var(--brass-deep) 34.5% 36%, transparent 36.5%),
-      repeating-radial-gradient(circle, #10161f 0 2px, #1c2433 2px 4px);
+    padding: 0;
+    background: none;
     box-shadow: 0 0 0 2px var(--navy-line), 0 12px 32px rgba(0, 0, 0, 0.35);
     transition: transform 0.15s ease;
+  }
+  /* The grooves live on a pseudo-element so only they spin; the label stays still. */
+  .disc::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background:
+      radial-gradient(circle, var(--navy) 0 9%, transparent 9.5%),
+      radial-gradient(circle at 50% 50%, var(--brass) 0 34%, var(--brass-deep) 34.5% 36%, transparent 36.5%),
+      conic-gradient(from 0deg, rgba(255, 255, 255, 0.07), transparent 25%, rgba(255, 255, 255, 0.07) 50%, transparent 75%),
+      repeating-radial-gradient(circle, #10161f 0 2px, #1c2433 2px 4px);
   }
   .disc:active { transform: scale(0.97); }
   .disc:disabled { cursor: default; }
   .disc span {
-    margin-top: 5.6rem;
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 1.1rem;
     font-family: var(--font-display);
     font-stretch: condensed;
     font-weight: 600;
     color: var(--lamp);
     letter-spacing: 0.02em;
   }
-  .disc.spinning { animation: spin 1.8s linear infinite; }
-  .disc.spinning span { animation: spin 1.8s linear infinite reverse; }
+  .disc.spinning::before { animation: spin 1.8s linear infinite; }
   @keyframes spin { to { transform: rotate(360deg); } }
 
   .choices {

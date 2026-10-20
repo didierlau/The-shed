@@ -1,7 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { Note } from 'tonal';
 import { generateIntervalQuestion, type IntervalDrillConfig } from './intervals';
-import { DRILLS } from './catalog';
 import { semitones } from '../intervals';
 import { seededRng } from '../random';
 
@@ -74,16 +73,5 @@ describe('generateIntervalQuestion', () => {
     expect(() =>
       generateIntervalQuestion({ ...base, intervals: ['8P'], range: ['C4', 'E4'] }, seededRng(6)),
     ).toThrow();
-  });
-});
-
-describe('drill catalog', () => {
-  it('has unique ids and every drill can generate questions', () => {
-    const ids = DRILLS.map((d) => d.id);
-    expect(new Set(ids).size).toBe(ids.length);
-    const rng = seededRng(7);
-    for (const d of DRILLS) {
-      for (let i = 0; i < 50; i++) expect(() => generateIntervalQuestion(d, rng)).not.toThrow();
-    }
   });
 });

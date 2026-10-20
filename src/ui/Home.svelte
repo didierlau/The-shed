@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { DRILLS } from '../core/drills';
+  import { DRILLS, DRILL_GROUPS } from '../core/drills';
   import { accuracy, type StatsTable } from '../core/stats';
   import { loadProgress } from '../storage/progress';
 
@@ -21,22 +21,24 @@
   <p>Ear training for jazz musicians. Pick a drill and start shedding.</p>
 </header>
 
-<section aria-labelledby="ears">
-  <h2 id="ears">Intervals</h2>
-  <ul>
-    {#each DRILLS as drill (drill.id)}
-      <li>
-        <a href={`#/drill/${drill.id}`}>
-          <span class="title">{drill.title}</span>
-          <span class="desc">{drill.description}</span>
-          <span class="score">{summary(progress.drills[drill.id])}</span>
-        </a>
-      </li>
-    {/each}
-  </ul>
-</section>
+{#each DRILL_GROUPS as group (group.kind)}
+  <section aria-labelledby={`group-${group.kind}`}>
+    <h2 id={`group-${group.kind}`}>{group.title}</h2>
+    <ul>
+      {#each DRILLS.filter((d) => d.kind === group.kind) as drill (drill.id)}
+        <li>
+          <a href={`#/drill/${drill.id}`}>
+            <span class="title">{drill.title}</span>
+            <span class="desc">{drill.description}</span>
+            <span class="score">{summary(progress.drills[drill.id])}</span>
+          </a>
+        </li>
+      {/each}
+    </ul>
+  </section>
+{/each}
 
-<footer>Chords, functional hearing, progressions and voicings are next.</footer>
+<footer>Functional hearing, progressions and voicings are next.</footer>
 
 <style>
   header { margin: 1.5rem 0 2.25rem; }
@@ -88,6 +90,8 @@
     font-variant-numeric: tabular-nums;
     white-space: nowrap;
   }
+
+  section + section { margin-top: 2.25rem; }
 
   footer { margin-top: 2rem; color: var(--dim); font-size: var(--step--1); }
 </style>
