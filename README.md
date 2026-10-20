@@ -22,7 +22,8 @@ Every push to `main` runs the tests and deploys to GitHub Pages
 src/
   core/      pure music logic: theory, drills, scoring. No DOM, no audio. Fully tested.
     drills/  one file per drill kind + catalog.ts (the list of levels, as data)
-    listen/  hearing you play: chord naming, MIDI note state, mic spectrum → notes, chord tracker
+    listen/  hearing you play: chord naming, MIDI note state, chord tracker, and for the mic:
+             per-key spectra, strike detection, calibration, and note decomposition
   audio/     the only code that makes sound (smplr piano, synth fallback)
   input/     the only code that listens: Web MIDI and the microphone
   storage/   the only code that saves progress, custom selections and settings (localStorage today)
@@ -53,6 +54,9 @@ Add an entry to `src/core/drills/catalog.ts`. No other change needed.
 4. ~~Progressions~~ (ii–V–Is, turnarounds, reharmonisations, standards building blocks)
 5. ~~Jazz voicings~~ (close, shell, drop-2, rootless A/B, So What, upper structures)
 6. ~~Listen: live chord naming~~ from a MIDI piano or the microphone
+   - mic: each strike is matched against the user's own piano, recorded once in a
+     guided calibration (quick C3–C5 or full C2–C6); a note only counts if its own
+     fundamental is there, which stops low "ghost" notes
 7. Improvisation evaluator, building on Listen:
    - record a take (`ChordEvent`s plus every note with its time)
    - enter or pick the tune's changes, so each note has a chord context

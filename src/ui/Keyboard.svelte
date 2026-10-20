@@ -1,6 +1,6 @@
 <script lang="ts">
-  /** A piano keyboard from C2 to C7 with the sounding notes lit. */
-  let { notes }: { notes: number[] } = $props();
+  /** A piano keyboard from C2 to C7 with the sounding notes lit, and optionally one key to play next. */
+  let { notes, target = null, done = [] }: { notes: number[]; target?: number | null; done?: number[] } = $props();
 
   const LOW = 36; // C2
   const HIGH = 96; // C7
@@ -13,17 +13,18 @@
   const H = 54;
 
   const on = $derived(new Set(notes));
+  const finished = $derived(new Set(done));
 </script>
 
 <svg viewBox={`0 0 ${whites.length * W} ${H}`} role="img" aria-label="Sounding notes on a keyboard" preserveAspectRatio="none">
   {#each whites as k (k)}
-    <rect class="white" class:on={on.has(k)} x={whiteIndex.get(k)! * W} y="0" width={W} height={H} />
+    <rect class="white" class:on={on.has(k)} class:target={target === k} class:done={finished.has(k)} x={whiteIndex.get(k)! * W} y="0" width={W} height={H} />
     {#if k % 12 === 0}
       <text x={whiteIndex.get(k)! * W + W / 2} y={H - 5}>C{Math.floor(k / 12) - 1}</text>
     {/if}
   {/each}
   {#each keys.filter((k) => BLACK.has(k % 12)) as k (k)}
-    <rect class="black" class:on={on.has(k)} x={whiteIndex.get(k - 1)! * W + W * 0.65} y="0" width={W * 0.7} height={H * 0.6} />
+    <rect class="black" class:on={on.has(k)} class:target={target === k} class:done={finished.has(k)} x={whiteIndex.get(k - 1)! * W + W * 0.65} y="0" width={W * 0.7} height={H * 0.6} />
   {/each}
 </svg>
 
@@ -32,5 +33,9 @@
   .white { fill: var(--lamp); stroke: var(--navy); stroke-width: 1; }
   .black { fill: #10161f; }
   .white.on, .black.on { fill: var(--brass); }
+  .white.done { fill: color-mix(in srgb, var(--brass) 35%, var(--lamp)); }
+  .black.done { fill: color-mix(in srgb, var(--brass) 45%, #10161f); }
+  .target { fill: var(--brass) !important; animation: pulse 1s ease-in-out infinite; }
+  @keyframes pulse { 50% { opacity: 0.45; } }
   text { font-size: 5px; fill: var(--navy); text-anchor: middle; opacity: 0.6; }
 </style>

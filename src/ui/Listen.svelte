@@ -3,6 +3,9 @@
   import { alternativeNames, noteNames, type ChordGuess } from '../core/listen/chordName';
   import { midiSupported, startMidi, type MidiSession } from '../input/midi';
   import { micSupported, startMic, type MicSession } from '../input/mic';
+  import { buildDictionary } from '../core/listen/calibration';
+  import { MicTranscriber } from '../core/listen/strikes';
+  import { loadCalibration } from '../storage/calibration';
   import Keyboard from './Keyboard.svelte';
 
   type Source = 'midi' | 'mic';
@@ -15,6 +18,7 @@
   let notes = $state<number[]>([]);
   let guesses = $state<ChordGuess[]>([]);
   let history = $state<ChordEvent[]>([]);
+  const calibration = loadCalibration();
 
   let session: MidiSession | MicSession | null = null;
   let tracker = new ChordTracker(80);
@@ -32,8 +36,8 @@
   async function start() {
     error = '';
     stop();
-    // The microphone is noisier, so wait a bit longer before a chord counts.
-    tracker = new ChordTracker(source === 'mic' ? 250 : 80);
+    // Mic notes arrive already settled per strike, so they count straight away.
+    tracker = new ChordTracker(source === 'mic' ? 0 : 80);
     try {
       if (source === 'midi') {
         session = await startMidi({
@@ -44,12 +48,15 @@
           onDevices: (names) => (devices = names),
         });
       } else {
-        session = await startMic({
-          onNotes: (n) => {
+        // Matches each strike against this piano's recorded notes (or a modelled piano).
+        const transcriber = new MicTranscriber(buildDictionary(calibration));
+        session = await startMic((frame) => {
+          level = Math.min(1, frame.rms * 8);
+          const n = transcriber.push(frame);
+          if (n) {
             notes = n;
             track();
-          },
-          onLevel: (l) => (level = l),
+          }
         });
       }
       listening = true;
@@ -109,11 +116,25 @@
     Connected: {devices.join(', ')}
   {:else if source === 'mic' && listening}
     <span class="meter" aria-hidden="true"><span style:width={`${Math.round(level * 100)}%`}></span></span>
-    Best guess from the microphone. Works best with one chord at a time in a quiet room.
+    Each chord is read just after you strike it and held until the next one.
   {:else}
-    {source === 'midi' ? 'Exact notes from a digital piano.' : 'Works with any piano. Chord names are a best guess.'}
+    {source === 'midi' ? 'Exact notes from a digital piano.' : 'Works with any piano.'}
   {/if}
 </p>
+
+{#if source === 'mic'}
+  {#if calibration}
+    <p class="calibrated">
+      Tuned to your piano ({calibration.keys.length} keys, {new Date(calibration.createdAt).toLocaleDateString()}).
+      <a href="#/calibrate">Recalibrate</a>
+    </p>
+  {:else}
+    <a class="calibrate" href="#/calibrate">
+      <span class="title">Teach the app your piano</span>
+      <span class="desc">Play each key once, about 30 seconds. Makes mic detection far more reliable.</span>
+    </a>
+  {/if}
+{/if}
 
 <div class="stage" aria-live="polite">
   <div class="chord">{best ? best.symbol : listening ? '…' : '—'}</div>
@@ -169,6 +190,22 @@
   }
   .segment.on { border-color: var(--brass); color: var(--lamp); background: color-mix(in srgb, var(--brass) 14%, var(--navy-raised)); }
   .segment:disabled { opacity: 0.4; cursor: default; }
+
+  .calibrated { margin: 0.25rem 0 0; color: var(--dim); font-size: var(--step--1); }
+  .calibrated a { color: var(--brass); display: inline-block; padding: 0.6rem 0; }
+  .calibrate {
+    display: grid;
+    gap: 0.15rem;
+    margin-top: 0.5rem;
+    padding: 0.85rem 1rem;
+    border: 1px solid var(--brass-deep);
+    border-radius: 0.6rem;
+    background: var(--navy-raised);
+    color: inherit;
+    text-decoration: none;
+  }
+  .calibrate .title { color: var(--brass); font-weight: 600; }
+  .calibrate .desc { color: var(--dim); font-size: var(--step--1); }
 
   .status { min-height: 3em; margin: 0.75rem 0 0; color: var(--dim); font-size: var(--step--1); }
   .error { color: var(--wrong); }
