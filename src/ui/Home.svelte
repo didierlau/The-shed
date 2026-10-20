@@ -38,7 +38,6 @@
   </section>
 {/each}
 
-<footer>Jazz voicings are next.</footer>
 
 <style>
   header { margin: 1.5rem 0 2.25rem; }
@@ -93,5 +92,4 @@
 
   section + section { margin-top: 2.25rem; }
 
-  footer { margin-top: 2rem; color: var(--dim); font-size: var(--step--1); }
 </style>

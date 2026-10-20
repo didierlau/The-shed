@@ -3,19 +3,20 @@ import type { IntervalDrillConfig } from './intervals';
 import type { ChordDrillConfig } from './chords';
 import type { DegreeDrillConfig, FunctionDrillConfig } from './functional';
 import type { ProgressionDrillConfig } from './progressions';
+import type { VoicingDrillConfig } from './voicings';
 import { MAJOR_KEYS } from '../keys';
 
 /**
  * All drills in the app, in suggested order.
- * Adding a level = adding an entry here. Future drill kinds
- * (voicings) join this union.
+ * Adding a level = adding an entry here. New drill kinds join this union.
  */
 export type DrillConfig =
   | IntervalDrillConfig
   | ChordDrillConfig
   | DegreeDrillConfig
   | FunctionDrillConfig
-  | ProgressionDrillConfig;
+  | ProgressionDrillConfig
+  | VoicingDrillConfig;
 
 const RANGE: [string, string] = ['C3', 'C5'];
 const ROOTS: [string, string] = ['C3', 'G3'];
@@ -259,6 +260,46 @@ export const DRILLS: DrillConfig[] = [
     ],
     keys: MAJOR_KEYS,
   },
+  {
+    kind: 'voicings',
+    id: 'voicings-basics',
+    title: 'Close, shell or drop-2',
+    description: 'Three ways to play the same 7th chord.',
+    voicings: ['close', 'shell', 'drop2'],
+    qualities: ['maj7', 'm7', '7'],
+  },
+  {
+    kind: 'voicings',
+    id: 'voicings-rootless',
+    title: 'Rootless A or B',
+    description: 'The Bill Evans left-hand voicings: 3 on the bottom, or 7.',
+    voicings: ['rootlessA', 'rootlessB'],
+    qualities: ['maj7', 'm7', '7', 'm7b5'],
+  },
+  {
+    kind: 'voicings',
+    id: 'voicings-comping',
+    title: 'Comping voicings',
+    description: 'Shell, drop-2 and both rootless shapes.',
+    voicings: ['shell', 'drop2', 'rootlessA', 'rootlessB'],
+    qualities: ['maj7', 'm7', '7', 'm7b5'],
+  },
+  {
+    kind: 'voicings',
+    id: 'voicings-modern',
+    title: 'Modern colours',
+    description: 'So What 4ths and upper-structure triads against rootless and drop-2.',
+    voicings: ['soWhat', 'upperStructure', 'rootlessA', 'drop2'],
+    qualities: ['m7', '7'],
+  },
+  {
+    kind: 'voicings',
+    id: 'voicings-all',
+    title: 'All voicings',
+    description: 'Every voicing on every chord it fits. Adaptive to your weak spots.',
+    voicings: ['close', 'shell', 'drop2', 'rootlessA', 'rootlessB', 'soWhat', 'upperStructure'],
+    qualities: ['maj7', 'm7', '7', 'm7b5'],
+  },
 ];
 
 /** Home-screen sections, in order. Each lists the drill kinds it shows. */
@@ -267,6 +308,7 @@ export const DRILL_GROUPS: { kinds: DrillConfig['kind'][]; title: string }[] = [
   { kinds: ['chords'], title: 'Chord qualities' },
   { kinds: ['degrees', 'functions'], title: 'Functional hearing' },
   { kinds: ['progressions'], title: 'Progressions' },
+  { kinds: ['voicings'], title: 'Jazz voicings' },
 ];
 
 export function findDrill(id: string): DrillConfig | undefined {
