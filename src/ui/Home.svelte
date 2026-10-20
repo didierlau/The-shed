@@ -34,6 +34,11 @@
   {/each}
 </ul>
 
+<a class="listen" href="#/listen">
+  <span class="title">Listen</span>
+  <span class="desc">Play your piano and see the chord names.</span>
+</a>
+
 <style>
   header { margin: 1.5rem 0 1.75rem; }
 
@@ -88,4 +93,13 @@
     white-space: nowrap;
   }
   .score::after { content: ' ›'; }
+
+  .listen {
+    margin-top: 1.25rem;
+    border: 1px solid var(--brass-deep);
+    border-radius: 0.6rem;
+    padding: 0.85rem 1rem;
+    background: var(--navy-raised);
+  }
+  .listen .title { color: var(--brass); }
 </style>
