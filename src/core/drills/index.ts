@@ -1,0 +1,17 @@
+import type { StatsTable } from '../stats';
+import type { Question, Rng } from '../types';
+import type { DrillConfig } from './catalog';
+import { generateIntervalQuestion } from './intervals';
+
+export { DRILLS, findDrill, type DrillConfig } from './catalog';
+
+/**
+ * Single entry point the UI uses to get a question for any drill.
+ * When a new drill kind is added, add a case here — the UI stays unchanged.
+ */
+export function generateQuestion(config: DrillConfig, rng: Rng, stats?: StatsTable): Question {
+  switch (config.kind) {
+    case 'intervals':
+      return generateIntervalQuestion(config, rng, stats);
+  }
+}

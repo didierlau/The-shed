@@ -1,0 +1,59 @@
+/*
+  The Shed — design tokens.
+  Late-night practice room: deep navy walls, brass, warm lamp light.
+  One bold element (the play button); everything else stays quiet.
+*/
+:root {
+  --navy: #182030;
+  --navy-raised: #212b3e;
+  --navy-line: #33405a;
+  --brass: #d9a441;
+  --brass-deep: #a8792a;
+  --lamp: #f1e6cf;
+  --dim: #9aa6bb;
+  --right: #74c49a;
+  --wrong: #e88a7d;
+
+  --font-display: 'Roboto Condensed', 'sans-serif-condensed', 'Arial Narrow', 'Helvetica Neue', system-ui, sans-serif;
+  --font-body: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+
+  --step--1: 0.875rem;
+  --step-0: 1rem;
+  --step-1: 1.25rem;
+  --step-2: 1.6rem;
+  --step-3: 2.4rem;
+
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  background: var(--navy);
+  color: var(--lamp);
+  font-family: var(--font-body);
+  font-size: var(--step-0);
+  line-height: 1.5;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  min-height: 100dvh;
+  padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom);
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+:focus-visible {
+  outline: 2px solid var(--brass);
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}

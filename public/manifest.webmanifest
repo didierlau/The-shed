@@ -1,0 +1,13 @@
+{
+  "name": "The Shed",
+  "short_name": "The Shed",
+  "description": "A practice toolbox for jazz musicians.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#182030",
+  "theme_color": "#182030",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}
