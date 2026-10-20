@@ -23,8 +23,9 @@ src/
   core/      pure music logic: theory, drills, scoring. No DOM, no audio. Fully tested.
     drills/  one file per drill kind + catalog.ts (the list of levels, as data)
   audio/     the only code that makes sound (smplr piano, synth fallback)
-  storage/   the only code that saves progress (localStorage today)
+  storage/   the only code that saves progress and custom selections (localStorage today)
   ui/        Svelte screens; they display what core produces
+             Home (sections) → Section (levels + "Build your own") → Drill
 ```
 
 The rule that keeps this maintainable: **dependencies only point inwards.**
@@ -39,7 +40,8 @@ Add an entry to `src/core/drills/catalog.ts`. No other change needed.
 1. Create `src/core/drills/<kind>.ts` with a config type and a `generate…Question()` that returns a `Question`.
 2. Add tests next to it (`<kind>.test.ts`).
 3. Add the config type to the `DrillConfig` union in `catalog.ts`, a `case` in `drills/index.ts`, and a group in `DRILL_GROUPS`.
-4. Add levels to `DRILLS`. The UI picks them up automatically.
+4. Add a "Build your own" spec for it in `src/core/drills/custom.ts` (`CUSTOM_SPECS`).
+5. Add levels to `DRILLS`. The UI picks them up automatically.
 
 ## Roadmap
 

@@ -303,13 +303,33 @@ export const DRILLS: DrillConfig[] = [
 ];
 
 /** Home-screen sections, in order. Each lists the drill kinds it shows. */
-export const DRILL_GROUPS: { kinds: DrillConfig['kind'][]; title: string }[] = [
-  { kinds: ['intervals'], title: 'Intervals' },
-  { kinds: ['chords'], title: 'Chord qualities' },
-  { kinds: ['degrees', 'functions'], title: 'Functional hearing' },
-  { kinds: ['progressions'], title: 'Progressions' },
-  { kinds: ['voicings'], title: 'Jazz voicings' },
+export interface DrillGroup {
+  id: string;
+  title: string;
+  description: string;
+  kinds: DrillConfig['kind'][];
+}
+
+export const DRILL_GROUPS: DrillGroup[] = [
+  { id: 'intervals', title: 'Intervals', description: 'The distance between two notes.', kinds: ['intervals'] },
+  { id: 'chords', title: 'Chord qualities', description: 'Triads, 7ths, 6ths and shells.', kinds: ['chords'] },
+  {
+    id: 'functional',
+    title: 'Functional hearing',
+    description: 'Notes and chords in a key, after a ii\u2060–\u2060V\u2060–\u2060I.',
+    kinds: ['degrees', 'functions'],
+  },
+  { id: 'progressions', title: 'Progressions', description: 'ii\u2060–\u2060Vs, turnarounds and reharmonisations.', kinds: ['progressions'] },
+  { id: 'voicings', title: 'Jazz voicings', description: 'Shells, drop-2, rootless, So What.', kinds: ['voicings'] },
 ];
+
+export function findGroup(id: string): DrillGroup | undefined {
+  return DRILL_GROUPS.find((g) => g.id === id);
+}
+
+export function groupOfKind(kind: DrillConfig['kind']): DrillGroup {
+  return DRILL_GROUPS.find((g) => g.kinds.includes(kind))!;
+}
 
 export function findDrill(id: string): DrillConfig | undefined {
   return DRILLS.find((d) => d.id === id);

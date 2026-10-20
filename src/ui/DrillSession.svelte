@@ -5,7 +5,7 @@
   import { player } from '../audio/player';
   import { loadProgress, resetDrill, saveProgress } from '../storage/progress';
 
-  let { drill }: { drill: DrillConfig } = $props();
+  let { drill, back }: { drill: DrillConfig; back: { href: string; label: string } } = $props();
 
   let progress = $state(loadProgress());
   let question = $state<Question | null>(null);
@@ -78,7 +78,7 @@
 </script>
 
 <nav>
-  <a href="#/">Drills</a>
+  <a href={back.href}>{back.label}</a>
   <button class="link" onclick={reset}>Reset progress</button>
 </nav>
 

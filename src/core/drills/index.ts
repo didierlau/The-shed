@@ -7,7 +7,18 @@ import { generateDegreeQuestion, generateFunctionQuestion } from './functional';
 import { generateProgressionQuestion } from './progressions';
 import { generateVoicingQuestion } from './voicings';
 
-export { DRILLS, DRILL_GROUPS, findDrill, type DrillConfig } from './catalog';
+export { DRILLS, DRILL_GROUPS, findDrill, findGroup, groupOfKind, type DrillConfig, type DrillGroup } from './catalog';
+export {
+  buildCustomDrill,
+  CUSTOM_SPECS,
+  customDrillId,
+  customKindFromId,
+  MIN_ITEMS,
+  normaliseSelection,
+  type CustomSelection,
+  type CustomSpec,
+  type DrillKind,
+} from './custom';
 
 /**
  * Single entry point the UI uses to get a question for any drill.
