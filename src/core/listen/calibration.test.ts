@@ -57,6 +57,15 @@ describe('CalibrationSession', () => {
     expect(s.done).toBe(5);
   });
 
+  it('accepts a faint bass key from its upper partials when the lower ones are lost in noise', () => {
+    const s = new CalibrationSession(Note.midi('Eb2')!, Note.midi('Eb2')!);
+    const n = Note.midi('Eb2')!;
+    const v = pianoNote(n);
+    // Wash out the fundamental and 2nd partial with low-frequency rumble.
+    for (const k of [n, n + 1, n - 1, n + 12, n + 11, n + 13]) v[k - VEC_LOW] = 0.6;
+    expect(s.offer(v, silence, null).accepted).toBe(true);
+  });
+
   it('rejects the wrong key and says what it heard', () => {
     const s = new CalibrationSession(60, 72);
     const r = s.offer(pianoNote(62), silence, 0);
@@ -70,6 +79,26 @@ describe('CalibrationSession', () => {
     s.offer(pianoNote(61), silence, 0);
     s.undo();
     expect(s.expected).toBe(61);
+  });
+
+  it('can skip a key it cannot hear, and stop early with what it has', () => {
+    const s = new CalibrationSession(60, 72);
+    s.offer(pianoNote(60), silence, 0);
+    s.skip();
+    expect(s.expected).toBe(62);
+    s.offer(pianoNote(62), silence, 0);
+    expect(s.done).toBe(2);
+    expect(s.position).toBe(3);
+    expect(s.skipped).toEqual([61]);
+    s.undo(); // back over 62
+    s.undo(); // back over the skip
+    expect(s.expected).toBe(61);
+    expect(s.done).toBe(1);
+    // Finishing early keeps the recorded keys; the dictionary fills the rest from neighbours.
+    s.offer(pianoNote(61), silence, 0);
+    const cal = s.result('2026-10-20');
+    expect(cal.keys.map((k) => k.midi)).toEqual([60, 61]);
+    expect(buildDictionary(cal).notes).toContain(72);
   });
 
   it('measures tuning as the median, ignoring keys it could not measure', () => {

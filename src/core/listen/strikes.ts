@@ -23,9 +23,17 @@ export interface Strike {
 }
 
 /**
+ * How long after an attack the sound is analysed. Single keys during calibration
+ * are read early, while fast-fading high notes are still clearly there. Chords
+ * are read a little later, once the analysis window is mostly filled with the
+ * new chord rather than the one before it.
+ */
+export const SETTLE_MS = { key: 150, chord: 250 } as const;
+
+/**
  * Turns a stream of mic frames into strikes. A strike is reported a little after
- * the attack (`settleMs`), once the analysis window is mostly filled with the new
- * sound, so the chord is read at its clearest instead of while it decays.
+ * the attack (`settleMs`), so the chord is read at its clearest instead of while
+ * it decays.
  */
 export class StrikeWatcher {
   private onsets: OnsetDetector;
@@ -35,7 +43,7 @@ export class StrikeWatcher {
 
   constructor(
     private tuningCents = 0,
-    private settleMs = 250,
+    private settleMs: number = SETTLE_MS.chord,
     onset: OnsetOptions = {},
   ) {
     this.onsets = new OnsetDetector(onset);

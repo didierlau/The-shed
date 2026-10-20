@@ -112,16 +112,44 @@ describe('OnsetDetector', () => {
     expect(onsets).toEqual([300, 1500]);
   });
 
+  it('listens to the room briefly before the first strike can count', () => {
+    const d = new OnsetDetector();
+    expect(d.push(0, 0.2)).toBe(false);
+  });
+
+  it('catches quiet high notes in a quiet room', () => {
+    const d = new OnsetDetector();
+    const onsets: number[] = [];
+    let level = 0.0003; // quiet room
+    for (let t = 0; t < 3000; t += 30) {
+      if (t === 1200) level = 0.004; // a soft C6: well under the old fixed threshold
+      else level = Math.max(0.0003, level * 0.85); // high notes die away fast
+      if (d.push(t, level)) onsets.push(t);
+    }
+    expect(onsets).toEqual([1200]);
+  });
+
+  it('ignores a noisy room until something is actually played', () => {
+    const d = new OnsetDetector();
+    const onsets: number[] = [];
+    for (let t = 0; t < 3000; t += 30) {
+      const noise = 0.006 + 0.003 * Math.sin(t / 37) * Math.sin(t / 11); // fan, traffic
+      const level = t === 2400 ? 0.08 : noise;
+      if (d.push(t, level)) onsets.push(t);
+    }
+    expect(onsets).toEqual([2400]);
+  });
+
   it('fires when a new chord is struck over a ringing one', () => {
     const d = new OnsetDetector();
     const onsets: number[] = [];
     let level = 0;
-    for (let t = 0; t < 1500; t += 30) {
-      if (t === 0) level = 0.4;
-      else if (t === 900) level = Math.max(level, 0.3) + 0.25;
+    for (let t = 0; t < 1800; t += 30) {
+      if (t === 300) level = 0.4;
+      else if (t === 1200) level = Math.max(level, 0.3) + 0.25;
       else level *= 0.95;
       if (d.push(t, level)) onsets.push(t);
     }
-    expect(onsets).toEqual([0, 900]);
+    expect(onsets).toEqual([300, 1200]);
   });
 });

@@ -72,7 +72,10 @@ describe('MicTranscriber', () => {
   function transcribe(played: Played[], endMs: number): number[][] {
     const t = new MicTranscriber(dict);
     const changes: number[][] = [];
-    for (const f of frames(played, endMs)) {
+    // Half a second of room sound first, as when you press Start and then play.
+    const LEAD = 500;
+    const shifted = played.map((p) => ({ ...p, at: p.at + LEAD, until: p.until === undefined ? undefined : p.until + LEAD }));
+    for (const f of frames(shifted, endMs + LEAD)) {
       const notes = t.push(f);
       if (notes) changes.push(notes);
     }

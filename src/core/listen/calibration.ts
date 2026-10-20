@@ -31,23 +31,32 @@ export interface OfferResult {
 /** The new note must stand out this much from its neighbouring keys. */
 const CLARITY = 1.5;
 
+/** Does the key at `centre` stand out from the keys up to two semitones either side? */
+function standsOut(d: SemitoneVector, centre: number): boolean {
+  if (centre > VEC_HIGH) return false;
+  const here = at(d, centre);
+  let rival = 0;
+  for (let k = centre - 2; k <= centre + 2; k++) if (k !== centre) rival = Math.max(rival, at(d, k));
+  return here > 0 && here >= rival * CLARITY;
+}
+
 /**
- * Is `midi` clearly the note that was just struck? Checked on its fundamental,
- * or on its 2nd partial when the fundamental is too weak (low notes on a phone).
+ * Is `midi` clearly the note that was just struck? Checked on its fundamental, or
+ * its 2nd partial when the fundamental is too weak; for faint bass notes, its 3rd
+ * and 4th partials together (12th and two octaves up) also count.
  */
 export function isClearly(d: SemitoneVector, midi: number): boolean {
-  for (const centre of [midi, midi + 12]) {
-    if (centre > VEC_HIGH) continue;
-    const here = at(d, centre);
-    let rival = 0;
-    for (let k = centre - 2; k <= centre + 2; k++) if (k !== centre) rival = Math.max(rival, at(d, k));
-    if (here > 0 && here >= rival * CLARITY) return true;
-  }
-  return false;
+  return (
+    standsOut(d, midi) ||
+    standsOut(d, midi + 12) ||
+    (midi < 48 && standsOut(d, midi + 19) && standsOut(d, midi + 24))
+  );
 }
 
 export class CalibrationSession {
   private recorded: { midi: number; template: SemitoneVector; cents: number | null }[] = [];
+  /** Keys handled so far, recorded or skipped, in order. */
+  private handled: { midi: number; skipped: boolean }[] = [];
 
   constructor(
     readonly low: number,
@@ -58,36 +67,64 @@ export class CalibrationSession {
     return this.high - this.low + 1;
   }
 
+  /** Keys recorded (skipped keys don't count). */
   get done(): number {
     return this.recorded.length;
   }
 
+  /** Keys passed so far, recorded or skipped. */
+  get position(): number {
+    return this.handled.length;
+  }
+
+  get skipped(): number[] {
+    return this.handled.filter((h) => h.skipped).map((h) => h.midi);
+  }
+
   /** The key to play next, or null when finished. */
   get expected(): number | null {
-    const next = this.low + this.recorded.length;
+    const next = this.low + this.handled.length;
     return next <= this.high ? next : null;
   }
 
+  /** Move on without recording this key; nearby recorded keys stand in for it. */
+  skip(): void {
+    const midi = this.expected;
+    if (midi !== null) this.handled.push({ midi, skipped: true });
+  }
+
   /**
-   * Offer what was heard just after a strike (`after`) and just before it (`before`).
-   * Accepted if the expected key clearly sounds in the new energy.
+   * Is the expected key clearly in what was heard just after a strike (`after`),
+   * compared with just before it (`before`)? Doesn't record anything.
    */
-  offer(after: SemitoneVector, before: SemitoneVector, cents: number | null): OfferResult {
+  check(after: SemitoneVector, before: SemitoneVector): OfferResult {
     const midi = this.expected;
     if (midi === null) return { accepted: false, heard: null };
     const d = newEnergy(after, before);
-
     let heard: number | null = null;
     for (let k = midi - 6; k <= midi + 6; k++) if (at(d, k) > 0 && (heard === null || at(d, k) > at(d, heard))) heard = k;
-
-    if (!isClearly(d, midi)) return { accepted: false, heard };
-    this.recorded.push({ midi, template: unit(d), cents });
-    return { accepted: true, heard: midi };
+    return isClearly(d, midi) ? { accepted: true, heard: midi } : { accepted: false, heard };
   }
 
-  /** Forget the last recorded key (e.g. it was played twice by accident). */
+  /** Record the expected key's sound and move on to the next key. */
+  record(after: SemitoneVector, before: SemitoneVector, cents: number | null): void {
+    const midi = this.expected;
+    if (midi === null) return;
+    this.recorded.push({ midi, template: unit(newEnergy(after, before)), cents });
+    this.handled.push({ midi, skipped: false });
+  }
+
+  /** Check and, if it's the right key, record it in one go. */
+  offer(after: SemitoneVector, before: SemitoneVector, cents: number | null): OfferResult {
+    const result = this.check(after, before);
+    if (result.accepted) this.record(after, before, cents);
+    return result;
+  }
+
+  /** Step back one key (recorded or skipped), e.g. after a double strike. */
   undo(): void {
-    this.recorded.pop();
+    const last = this.handled.pop();
+    if (last && !last.skipped) this.recorded.pop();
   }
 
   result(createdAt: string): Calibration {
