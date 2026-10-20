@@ -12,7 +12,6 @@ const base: ChordDrillConfig = {
   qualities: ['maj7', '7', 'm7', 'm7b5', 'dim7'],
   voicing: 'close',
   playback: 'block',
-  rootRange: ['C3', 'G3'],
 };
 
 const offsets = (notes: string[]) => {
@@ -51,16 +50,20 @@ describe('spellChord', () => {
 });
 
 describe('generateChordQuestion', () => {
-  it('plays exactly the chord it asks for, rooted inside the range', () => {
+  it('plays exactly the chord it asks for, every note inside the range', () => {
     const rng = seededRng(11);
-    for (let i = 0; i < 300; i++) {
-      const q = generateChordQuestion(base, rng);
-      const chord = q.playback.at(-1)!.notes;
-      expect(offsets(chord)).toEqual(chordSemitones(q.answer as 'maj7'));
-      const root = Note.midi(chord[0]!)!;
-      expect(root).toBeGreaterThanOrEqual(Note.midi('C3')!);
-      expect(root).toBeLessThanOrEqual(Note.midi('G3')!);
+    const range = { low: Note.midi('C2')!, high: Note.midi('C6')! };
+    const roots = new Set<number>();
+    for (let i = 0; i < 1000; i++) {
+      const q = generateChordQuestion(base, rng, {}, range);
+      const chord = q.playback.at(-1)!.notes.map((n) => Note.midi(n)!);
+      expect(chord.map((m) => m - chord[0]!)).toEqual(chordSemitones(q.answer as 'maj7'));
+      expect(Math.min(...chord)).toBeGreaterThanOrEqual(range.low);
+      expect(Math.max(...chord)).toBeLessThanOrEqual(range.high);
+      roots.add(chord[0]!);
     }
+    // Roots spread across the range rather than sitting in one octave.
+    expect(Math.max(...roots) - Math.min(...roots)).toBeGreaterThan(30);
   });
 
   it('arpeggiates note by note, then plays the block chord', () => {

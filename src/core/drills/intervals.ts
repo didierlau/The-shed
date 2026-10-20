@@ -3,6 +3,7 @@ import { INTERVALS, semitones, type IntervalName } from '../intervals';
 import { randomInt, pick, weightedPick } from '../random';
 import { practiceWeight, type StatsTable } from '../stats';
 import type { Question, Rng } from '../types';
+import { DEFAULT_SETTINGS, type NoteRange } from '../settings';
 
 export type IntervalDirection = 'up' | 'down' | 'harmonic';
 
@@ -18,18 +19,17 @@ export interface IntervalDrillConfig {
   intervals: IntervalName[];
   /** One or more directions; each question picks one at random. */
   directions: IntervalDirection[];
-  /** Lowest and highest note that may be played, e.g. "C3" and "C5". */
-  range: [string, string];
 }
 
 /**
- * Create one question. If `stats` is given, intervals you get wrong more often
- * are picked more often (adaptive practice).
+ * Create one question, with both notes inside `range`. If `stats` is given,
+ * intervals you get wrong more often are picked more often (adaptive practice).
  */
 export function generateIntervalQuestion(
   config: IntervalDrillConfig,
   rng: Rng,
   stats: StatsTable = {},
+  range: NoteRange = DEFAULT_SETTINGS.range,
 ): Question {
   if (config.intervals.length === 0) throw new Error(`Drill "${config.id}" has no intervals`);
 
@@ -37,11 +37,8 @@ export function generateIntervalQuestion(
   const direction = pick(rng, config.directions);
   const size = semitones(interval);
 
-  const low = Note.midi(config.range[0]);
-  const high = Note.midi(config.range[1]);
-  if (low === null || high === null || high - low < size) {
-    throw new Error(`Drill "${config.id}" range ${config.range.join('–')} is too small for ${interval}`);
-  }
+  const { low, high } = range;
+  if (high - low < size) throw new Error(`Range is too small for ${interval}`);
 
   const bottomMidi = randomInt(rng, low, high - size);
   const bottom = Note.fromMidi(bottomMidi);
@@ -55,7 +52,8 @@ export function generateIntervalQuestion(
         : [{ notes: [top], beats: 1 }, { notes: [bottom], beats: 1.5 }];
 
   const arrow = direction === 'harmonic' ? '+' : '→';
-  const [first, second] = direction === 'down' ? [top, bottom] : [bottom, top];
+  const spelled = spellInterval(bottomMidi, interval);
+  const [first, second] = direction === 'down' ? [spelled.top, spelled.bottom] : [spelled.bottom, spelled.top];
 
   return {
     playback,
@@ -64,4 +62,19 @@ export function generateIntervalQuestion(
     answer: interval,
     reveal: `${INTERVALS[interval].label}: ${first} ${arrow} ${second}`,
   };
+}
+
+/**
+ * Spell an interval so its name matches what was asked: a major 6th from A is
+ * F#, not Gb. Of the flat and sharp names for the bottom note, the one giving
+ * fewer accidentals wins (Bb–D rather than A#–C##).
+ */
+export function spellInterval(bottomMidi: number, interval: IntervalName): { bottom: string; top: string } {
+  const names = [...new Set([Note.fromMidi(bottomMidi), Note.fromMidiSharps(bottomMidi)])];
+  const options = names.map((bottom) => {
+    const top = Note.transpose(bottom, interval);
+    return { bottom, top, cost: Note.get(bottom).acc.length + Note.get(top).acc.length };
+  });
+  options.sort((a, b) => a.cost - b.cost);
+  return { bottom: options[0]!.bottom, top: options[0]!.top };
 }

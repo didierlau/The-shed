@@ -13,12 +13,14 @@
   import Section from './Section.svelte';
   import CustomSetup from './CustomSetup.svelte';
   import DrillSession from './DrillSession.svelte';
+  import SettingsPage from './Settings.svelte';
 
   // Hash routing keeps the Android back button working:
   //   #/                  sections
   //   #/section/<id>      a section's levels and "Build your own"
   //   #/custom/<kind>     pick items for your own mix
   //   #/drill/<id>        practise (a level, or custom-<kind>)
+  //   #/settings          app-wide settings
   let hash = $state(location.hash);
   $effect(() => {
     const onHash = () => {
@@ -31,6 +33,7 @@
 
   const route = $derived.by(() => {
     const [, page = '', id = ''] = hash.split('/');
+    if (page === 'settings') return { page: 'settings' as const };
     if (page === 'section') {
       const group = findGroup(id);
       if (group) return { page: 'section' as const, group };
@@ -66,6 +69,8 @@
     {#key route.kind}
       <CustomSetup kind={route.kind} />
     {/key}
+  {:else if route.page === 'settings'}
+    <SettingsPage />
   {:else if route.page === 'section'}
     {#key route.group.id}
       <Section group={route.group} />

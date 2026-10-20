@@ -14,6 +14,7 @@ import {
 import { pick, weightedPick } from '../random';
 import { practiceWeight, type StatsTable } from '../stats';
 import type { Question, Rng } from '../types';
+import { DEFAULT_SETTINGS, type NoteRange } from '../settings';
 
 /**
  * Functional hearing: a ii–V–I sets the key, then you name what you hear
@@ -27,8 +28,6 @@ export interface DegreeDrillConfig {
   description: string;
   degrees: Degree[];
   keys: readonly MajorKey[];
-  /** Range the question note is played in, e.g. ["A3", "A4"]. */
-  range: [string, string];
 }
 
 export interface FunctionDrillConfig {
@@ -40,18 +39,23 @@ export interface FunctionDrillConfig {
   keys: readonly MajorKey[];
 }
 
-export function generateDegreeQuestion(config: DegreeDrillConfig, rng: Rng, stats: StatsTable = {}): Question {
+/** The question note is played anywhere inside `range`; the cadence stays in its comping register. */
+export function generateDegreeQuestion(
+  config: DegreeDrillConfig,
+  rng: Rng,
+  stats: StatsTable = {},
+  range: NoteRange = DEFAULT_SETTINGS.range,
+): Question {
   if (config.degrees.length === 0) throw new Error(`Drill "${config.id}" has no degrees`);
   const key = pick(rng, config.keys);
   const degree = weightedPick(rng, config.degrees, (d) => practiceWeight(stats[d]));
 
   // Every MIDI note in range that is this degree of this key.
-  const low = Note.midi(config.range[0])!;
-  const high = Note.midi(config.range[1])!;
+  const { low, high } = range;
   const chroma = (Note.chroma(key)! + DEGREES[degree].semitones) % 12;
   const candidates: number[] = [];
   for (let m = low; m <= high; m++) if (m % 12 === chroma) candidates.push(m);
-  if (candidates.length === 0) throw new Error(`Drill "${config.id}" range is too small`);
+  if (candidates.length === 0) throw new Error('Range is too small');
   const target = pick(rng, candidates);
 
   const tonic = target - DEGREES[degree].semitones;

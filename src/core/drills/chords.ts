@@ -3,6 +3,7 @@ import { CHORD_QUALITIES, chordSemitones, shellSemitones, spellChord, type Chord
 import { randomInt, weightedPick } from '../random';
 import { practiceWeight, type StatsTable } from '../stats';
 import type { PlaybackStep, Question, Rng } from '../types';
+import { DEFAULT_SETTINGS, type NoteRange } from '../settings';
 
 export type ChordVoicing = 'close' | 'shell';
 export type ChordPlayback = 'block' | 'arpeggio';
@@ -17,22 +18,22 @@ export interface ChordDrillConfig {
   voicing: ChordVoicing;
   /** 'arpeggio' plays the notes one by one, then together. */
   playback: ChordPlayback;
-  /** Range the chord root is chosen from, e.g. ["C3", "G3"]. */
-  rootRange: [string, string];
 }
 
-export function generateChordQuestion(config: ChordDrillConfig, rng: Rng, stats: StatsTable = {}): Question {
+/** The whole chord is played inside `range`; its root anywhere that leaves room for the top note. */
+export function generateChordQuestion(
+  config: ChordDrillConfig,
+  rng: Rng,
+  stats: StatsTable = {},
+  range: NoteRange = DEFAULT_SETTINGS.range,
+): Question {
   if (config.qualities.length === 0) throw new Error(`Drill "${config.id}" has no chord qualities`);
 
   const quality = weightedPick(rng, config.qualities, (q) => practiceWeight(stats[q]));
-  const low = Note.midi(config.rootRange[0]);
-  const high = Note.midi(config.rootRange[1]);
-  if (low === null || high === null || high < low) {
-    throw new Error(`Drill "${config.id}" has an invalid root range ${config.rootRange.join('–')}`);
-  }
-
-  const rootMidi = randomInt(rng, low, high);
   const offsets = config.voicing === 'shell' ? shellSemitones(quality) : chordSemitones(quality);
+  const span = Math.max(...offsets);
+  if (range.high - range.low < span) throw new Error(`Range is too small for ${quality}`);
+  const rootMidi = randomInt(rng, range.low, range.high - span);
   const notes = offsets.map((o) => Note.fromMidi(rootMidi + o));
 
   const block: PlaybackStep = { notes, beats: 3 };

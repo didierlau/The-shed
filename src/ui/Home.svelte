@@ -15,7 +15,10 @@
 </script>
 
 <header>
-  <h1>The Shed</h1>
+  <div class="top">
+    <h1>The Shed</h1>
+    <a class="settings" href="#/settings">Settings</a>
+  </div>
   <p>Ear training for jazz musicians.</p>
 </header>
 
@@ -46,6 +49,14 @@
   }
 
   header p { margin: 0; color: var(--dim); }
+
+  .top { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; }
+  .settings {
+    color: var(--dim);
+    font-size: var(--step--1);
+    text-decoration: none;
+    padding: 0.6rem 0;
+  }
 
   ul { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--navy-line); }
   li { border-bottom: 1px solid var(--navy-line); }

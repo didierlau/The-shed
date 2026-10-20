@@ -31,10 +31,10 @@ class WebAudioPlayer implements Player {
 
   private async loadPiano(ctx: AudioContext): Promise<void> {
     try {
-      // Load every third note of the middle keyboard at one velocity layer, to keep the
-      // download small; notes in between are pitch-shifted from the nearest sample.
+      // Load every third note from A1 to C7 (the widest range setting) at one velocity
+      // layer, to keep the download small; notes in between are pitch-shifted from the nearest sample.
       const piano = new SplendidGrandPiano(ctx, {
-        notesToLoad: { notes: range(36, 84).filter((m) => m % 3 === 0), velocityRange: [70, 90] },
+        notesToLoad: { notes: range(33, 96).filter((m) => m % 3 === 0), velocityRange: [70, 90] },
       });
       await Promise.race([piano.ready, timeout(15000)]);
       this.piano = piano;

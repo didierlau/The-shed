@@ -18,9 +18,6 @@ export type DrillConfig =
   | ProgressionDrillConfig
   | VoicingDrillConfig;
 
-const RANGE: [string, string] = ['C3', 'C5'];
-const ROOTS: [string, string] = ['C3', 'G3'];
-const MELODY: [string, string] = ['A3', 'A4'];
 const EASY_KEYS = ['C', 'F', 'Bb', 'G'] as const;
 
 export const DRILLS: DrillConfig[] = [
@@ -31,7 +28,6 @@ export const DRILLS: DrillConfig[] = [
     description: '4ths, 5ths and octaves — the skeleton of harmony.',
     intervals: ['4P', '5P', '8P'],
     directions: ['up'],
-    range: RANGE,
   },
   {
     kind: 'intervals',
@@ -40,7 +36,6 @@ export const DRILLS: DrillConfig[] = [
     description: 'Major vs minor 3rd: the sound of chord quality.',
     intervals: ['3m', '3M'],
     directions: ['up', 'down'],
-    range: RANGE,
   },
   {
     kind: 'intervals',
@@ -49,7 +44,6 @@ export const DRILLS: DrillConfig[] = [
     description: 'Half and whole steps — the building blocks of lines.',
     intervals: ['2m', '2M'],
     directions: ['up', 'down'],
-    range: RANGE,
   },
   {
     kind: 'intervals',
@@ -58,7 +52,6 @@ export const DRILLS: DrillConfig[] = [
     description: 'The colours that make jazz chords sound like jazz.',
     intervals: ['6m', '6M', '7m', '7M'],
     directions: ['up', 'down'],
-    range: RANGE,
   },
   {
     kind: 'intervals',
@@ -67,7 +60,6 @@ export const DRILLS: DrillConfig[] = [
     description: 'Tritone, 3rds and 7ths stacked together — hear the shells.',
     intervals: ['3m', '3M', '4A', '7m', '7M'],
     directions: ['harmonic'],
-    range: RANGE,
   },
   {
     kind: 'intervals',
@@ -76,7 +68,6 @@ export const DRILLS: DrillConfig[] = [
     description: 'Everything, melodic and harmonic. Adaptive to your weak spots.',
     intervals: ALL_INTERVALS,
     directions: ['up', 'down', 'harmonic'],
-    range: RANGE,
   },
   {
     kind: 'chords',
@@ -86,7 +77,6 @@ export const DRILLS: DrillConfig[] = [
     qualities: ['M', 'm'],
     voicing: 'close',
     playback: 'arpeggio',
-    rootRange: ROOTS,
   },
   {
     kind: 'chords',
@@ -96,7 +86,6 @@ export const DRILLS: DrillConfig[] = [
     qualities: ['M', 'm', 'dim', 'aug'],
     voicing: 'close',
     playback: 'arpeggio',
-    rootRange: ROOTS,
   },
   {
     kind: 'chords',
@@ -106,7 +95,6 @@ export const DRILLS: DrillConfig[] = [
     qualities: ['maj7', '7', 'm7'],
     voicing: 'close',
     playback: 'arpeggio',
-    rootRange: ROOTS,
   },
   {
     kind: 'chords',
@@ -116,7 +104,6 @@ export const DRILLS: DrillConfig[] = [
     qualities: ['maj7', '7', 'm7', 'm7b5', 'dim7'],
     voicing: 'close',
     playback: 'arpeggio',
-    rootRange: ROOTS,
   },
   {
     kind: 'chords',
@@ -126,7 +113,6 @@ export const DRILLS: DrillConfig[] = [
     qualities: ['6', 'm6', 'mMaj7', 'maj7', 'm7'],
     voicing: 'close',
     playback: 'block',
-    rootRange: ROOTS,
   },
   {
     kind: 'chords',
@@ -136,7 +122,6 @@ export const DRILLS: DrillConfig[] = [
     qualities: ['maj7', '7', 'm7', '6', '7sus4'],
     voicing: 'shell',
     playback: 'block',
-    rootRange: ROOTS,
   },
   {
     kind: 'chords',
@@ -146,7 +131,6 @@ export const DRILLS: DrillConfig[] = [
     qualities: ['maj7', '7', 'm7', 'm7b5', 'dim7', 'mMaj7', '6', 'm6', '7sus4'],
     voicing: 'close',
     playback: 'block',
-    rootRange: ROOTS,
   },
   {
     kind: 'degrees',
@@ -155,7 +139,6 @@ export const DRILLS: DrillConfig[] = [
     description: 'Hear the tonic triad notes against a ii\u2060–\u2060V\u2060–\u2060I.',
     degrees: ['1', '3', '5'],
     keys: EASY_KEYS,
-    range: MELODY,
   },
   {
     kind: 'degrees',
@@ -164,7 +147,6 @@ export const DRILLS: DrillConfig[] = [
     description: 'Add 2 and 4: the lower half of the scale.',
     degrees: ['1', '2', '3', '4', '5'],
     keys: EASY_KEYS,
-    range: MELODY,
   },
   {
     kind: 'degrees',
@@ -173,7 +155,6 @@ export const DRILLS: DrillConfig[] = [
     description: 'All seven degrees, in every key.',
     degrees: ['1', '2', '3', '4', '5', '6', '7'],
     keys: MAJOR_KEYS,
-    range: MELODY,
   },
   {
     kind: 'degrees',
@@ -182,7 +163,6 @@ export const DRILLS: DrillConfig[] = [
     description: '♭3, ♭5 and ♭7 against the major sound — the blues inside jazz.',
     degrees: ['1', 'b3', '3', 'b5', '5', '6', 'b7'],
     keys: MAJOR_KEYS,
-    range: MELODY,
   },
   {
     kind: 'degrees',
@@ -191,7 +171,6 @@ export const DRILLS: DrillConfig[] = [
     description: 'Every chromatic note in every key. Adaptive to your weak spots.',
     degrees: ['1', 'b2', '2', 'b3', '3', '4', 'b5', '5', 'b6', '6', 'b7', '7'],
     keys: MAJOR_KEYS,
-    range: MELODY,
   },
   {
     kind: 'functions',

@@ -189,7 +189,6 @@ export function buildCustomDrill(kind: DrillKind, raw: Partial<CustomSelection> 
         kind,
         intervals: sel.items as IntervalName[],
         directions: sel.options.directions as IntervalDirection[],
-        range: ['C3', 'C5'],
       };
     case 'chords':
       return {
@@ -198,10 +197,9 @@ export function buildCustomDrill(kind: DrillKind, raw: Partial<CustomSelection> 
         qualities: sel.items as ChordQuality[],
         voicing: 'close',
         playback: sel.options.playback![0] === 'block' ? 'block' : 'arpeggio',
-        rootRange: ['C3', 'G3'],
       };
     case 'degrees':
-      return { ...base, kind, degrees: sel.items as Degree[], keys, range: ['A3', 'A4'] };
+      return { ...base, kind, degrees: sel.items as Degree[], keys };
     case 'functions':
       return { ...base, kind, functions: sel.items as HarmonicFunction[], keys };
     case 'progressions':

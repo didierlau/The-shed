@@ -4,10 +4,12 @@
   import type { Question } from '../core/types';
   import { player } from '../audio/player';
   import { loadProgress, resetDrill, saveProgress } from '../storage/progress';
+  import { loadSettings } from '../storage/settings';
 
   let { drill, back }: { drill: DrillConfig; back: { href: string; label: string } } = $props();
 
   let progress = $state(loadProgress());
+  const settings = loadSettings();
   let question = $state<Question | null>(null);
   let picked = $state<string | null>(null);
   let playing = $state(false);
@@ -41,7 +43,7 @@
   }
 
   async function next() {
-    question = generateQuestion(drill, Math.random, stats);
+    question = generateQuestion(drill, Math.random, stats, settings);
     picked = null;
     await playSteps(question.playback);
   }

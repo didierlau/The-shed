@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { Note } from 'tonal';
-import { generateIntervalQuestion, type IntervalDrillConfig } from './intervals';
+import { generateIntervalQuestion, spellInterval, type IntervalDrillConfig } from './intervals';
 import { semitones } from '../intervals';
 import { seededRng } from '../random';
 
@@ -11,7 +11,6 @@ const base: IntervalDrillConfig = {
   description: '',
   intervals: ['3m', '3M', '5P'],
   directions: ['up', 'down', 'harmonic'],
-  range: ['C3', 'C5'],
 };
 
 function allNotes(q: ReturnType<typeof generateIntervalQuestion>): number[] {
@@ -29,16 +28,20 @@ describe('generateIntervalQuestion', () => {
     }
   });
 
-  it('stays inside the configured range', () => {
+  it('stays inside the given range, and uses all of it', () => {
     const rng = seededRng(2);
-    const low = Note.midi('C3')!;
-    const high = Note.midi('C5')!;
-    for (let i = 0; i < 500; i++) {
-      for (const m of allNotes(generateIntervalQuestion(base, rng))) {
+    const low = Note.midi('A1')!;
+    const high = Note.midi('C7')!;
+    const seen = new Set<number>();
+    for (let i = 0; i < 2000; i++) {
+      for (const m of allNotes(generateIntervalQuestion(base, rng, {}, { low, high }))) {
+        seen.add(m);
         expect(m).toBeGreaterThanOrEqual(low);
         expect(m).toBeLessThanOrEqual(high);
       }
     }
+    expect(Math.min(...seen)).toBe(low);
+    expect(Math.max(...seen)).toBe(high);
   });
 
   it('orders notes according to direction', () => {
@@ -71,7 +74,17 @@ describe('generateIntervalQuestion', () => {
 
   it('rejects a range too small for the interval', () => {
     expect(() =>
-      generateIntervalQuestion({ ...base, intervals: ['8P'], range: ['C4', 'E4'] }, seededRng(6)),
+      generateIntervalQuestion({ ...base, intervals: ['8P'] }, seededRng(6), {}, { low: Note.midi('C4')!, high: Note.midi('E4')! }),
     ).toThrow();
+  });
+});
+
+describe('spellInterval', () => {
+  it('spells the interval that was asked, with the simplest names', () => {
+    expect(spellInterval(Note.midi('A3')!, '6M')).toEqual({ bottom: 'A3', top: 'F#4' });
+    expect(spellInterval(Note.midi('Bb3')!, '3M')).toEqual({ bottom: 'Bb3', top: 'D4' });
+    expect(spellInterval(Note.midi('C4')!, '4A')).toEqual({ bottom: 'C4', top: 'F#4' });
+    expect(spellInterval(Note.midi('E4')!, '2m')).toEqual({ bottom: 'E4', top: 'F4' });
+    expect(spellInterval(Note.midi('B3')!, '8P')).toEqual({ bottom: 'B3', top: 'B4' });
   });
 });

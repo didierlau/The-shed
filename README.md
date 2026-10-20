@@ -23,9 +23,9 @@ src/
   core/      pure music logic: theory, drills, scoring. No DOM, no audio. Fully tested.
     drills/  one file per drill kind + catalog.ts (the list of levels, as data)
   audio/     the only code that makes sound (smplr piano, synth fallback)
-  storage/   the only code that saves progress and custom selections (localStorage today)
+  storage/   the only code that saves progress, custom selections and settings (localStorage today)
   ui/        Svelte screens; they display what core produces
-             Home (sections) → Section (levels + "Build your own") → Drill
+             Home (sections) → Section (levels + "Build your own") → Drill; Settings (note range)
 ```
 
 The rule that keeps this maintainable: **dependencies only point inwards.**

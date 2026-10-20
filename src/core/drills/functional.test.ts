@@ -17,7 +17,6 @@ const degrees: DegreeDrillConfig = {
   description: '',
   degrees: ['1', 'b3', '3', '5', 'b7'],
   keys: MAJOR_KEYS,
-  range: ['A3', 'A4'],
 };
 
 const functions: FunctionDrillConfig = {
@@ -35,8 +34,9 @@ const tonicChroma = (q: { playback: { notes: string[] }[] }) => Note.chroma(q.pl
 describe('generateDegreeQuestion', () => {
   it('plays a cadence, then a note that is the asked degree of that key, in range', () => {
     const rng = seededRng(21);
+    const range = { low: Note.midi('A3')!, high: Note.midi('A4')! };
     for (let i = 0; i < 300; i++) {
-      const q = generateDegreeQuestion(degrees, rng);
+      const q = generateDegreeQuestion(degrees, rng, {}, range);
       expect(q.playback).toHaveLength(5);
       const note = q.playback.at(-1)!.notes;
       expect(note).toHaveLength(1);
