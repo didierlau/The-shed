@@ -38,7 +38,7 @@ Add an entry to `src/core/drills/catalog.ts`. No other change needed.
 
 1. Create `src/core/drills/<kind>.ts` with a config type and a `generate…Question()` that returns a `Question`.
 2. Add tests next to it (`<kind>.test.ts`).
-3. Add the config type to the `DrillConfig` union in `catalog.ts` , a `case` in `drills/index.ts`, and a group in `DRILL_GROUPS`.
+3. Add the config type to the `DrillConfig` union in `catalog.ts`, a `case` in `drills/index.ts`, and a group in `DRILL_GROUPS`.
 4. Add levels to `DRILLS`. The UI picks them up automatically.
 
 ## Roadmap
