@@ -7,6 +7,7 @@
   import { MicTranscriber } from '../core/listen/strikes';
   import { loadCalibration } from '../storage/calibration';
   import { loadSettings, saveSettings } from '../storage/settings';
+  import { player } from '../audio/player';
   import Keyboard from './Keyboard.svelte';
 
   type Source = 'midi' | 'mic';
@@ -31,6 +32,12 @@
     track();
   }
 
+  function setMidiSound(on: boolean) {
+    settings.midiSound = on;
+    saveSettings($state.snapshot(settings));
+    if (!on) for (let n = 0; n < 128; n++) player.noteOff(n);
+  }
+
   let session: MidiSession | MicSession | null = null;
   let tracker = new ChordTracker(80, { useBass: true });
   let ticker: ReturnType<typeof setInterval> | null = null;
@@ -51,7 +58,13 @@
     tracker = new ChordTracker(source === 'mic' ? 0 : 80, { useBass: source === 'midi' || settings.micUsesBass });
     try {
       if (source === 'midi') {
+        // Start audio from this tap so played notes can sound; samples finish loading in the background.
+        void player.unlock().catch(() => {});
         session = await startMidi({
+          onVoices: (actions) => {
+            if (!settings.midiSound) return;
+            for (const a of actions) a.type === 'start' ? player.noteOn(a.note, a.velocity) : player.noteOff(a.note);
+          },
           onNotes: (n) => {
             notes = n;
             track();
@@ -132,6 +145,20 @@
     {source === 'midi' ? 'Exact notes from a digital piano.' : 'Works with any piano.'}
   {/if}
 </p>
+
+{#if source === 'midi'}
+  <label class="toggle">
+    <input type="checkbox" checked={settings.midiSound} onchange={(e) => setMidiSound(e.currentTarget.checked)} />
+    <span>
+      Play the sound on this phone
+      <span class="desc">
+        {settings.midiSound
+          ? 'Hear what you play through the phone, with the sustain pedal. Turn off if your piano’s own speakers are on.'
+          : 'Silent: only the chord names are shown.'}
+      </span>
+    </span>
+  </label>
+{/if}
 
 {#if source === 'mic'}
   {#if calibration}

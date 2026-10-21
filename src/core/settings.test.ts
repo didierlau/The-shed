@@ -17,6 +17,9 @@ describe('settings', () => {
     // Older saved settings without the mic option get the default.
     expect(normaliseSettings({ range: { low: 48, high: 84 } }).micUsesBass).toBe(false);
     expect(normaliseSettings({ range: { low: 48, high: 84 }, micUsesBass: true }).micUsesBass).toBe(true);
+    // MIDI sound is on unless switched off.
+    expect(normaliseSettings({ range: { low: 48, high: 84 } }).midiSound).toBe(true);
+    expect(normaliseSettings({ range: { low: 48, high: 84 }, midiSound: false }).midiSound).toBe(false);
     // Too narrow: widened upwards to two octaves.
     expect(normaliseSettings({ range: { low: 60, high: 62 } }).range).toEqual({ low: 60, high: 60 + MIN_RANGE_SPAN });
     // Out of bounds: clamped.
@@ -38,7 +41,7 @@ describe('settings', () => {
   it('every drill works at the narrowest and the widest range', () => {
     const rng = seededRng(61);
     const narrow = { range: { low: Note.midi('C4')!, high: Note.midi('C4')! + MIN_RANGE_SPAN }, micUsesBass: false };
-    for (const settings of [narrow, ...RANGE_PRESETS.map((p) => ({ range: p.range, micUsesBass: false }))]) {
+    for (const settings of [narrow, ...RANGE_PRESETS.map((p) => ({ range: p.range, micUsesBass: false, midiSound: true }))]) {
       for (const d of DRILLS) {
         for (let i = 0; i < 20; i++) expect(() => generateQuestion(d, rng, {}, settings)).not.toThrow();
       }
