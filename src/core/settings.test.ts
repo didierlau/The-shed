@@ -40,7 +40,7 @@ describe('settings', () => {
 
   it('every drill works at the narrowest and the widest range', () => {
     const rng = seededRng(61);
-    const narrow = { range: { low: Note.midi('C4')!, high: Note.midi('C4')! + MIN_RANGE_SPAN }, micUsesBass: false };
+    const narrow = { range: { low: Note.midi('C4')!, high: Note.midi('C4')! + MIN_RANGE_SPAN }, micUsesBass: false, midiSound: true };
     for (const settings of [narrow, ...RANGE_PRESETS.map((p) => ({ range: p.range, micUsesBass: false, midiSound: true }))]) {
       for (const d of DRILLS) {
         for (let i = 0; i < 20; i++) expect(() => generateQuestion(d, rng, {}, settings)).not.toThrow();
