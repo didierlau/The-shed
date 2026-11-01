@@ -50,13 +50,10 @@ const KEYS_OPTION: CustomOption = {
     { value: 'all', label: 'All 12' },
   ],
   multi: false,
-  default: ['easy'],
+  default: ['all'],
 };
 
 const EASY_KEYS = ['C', 'F', 'Bb', 'G'] as const;
-
-/** For functional hearing the cadence resets the ear, so the key adds no difficulty: all 12 by default. */
-const KEYS_OPTION_ALL: CustomOption = { ...KEYS_OPTION, default: ['all'] };
 
 /**
  * Items in an explicit musical order. (Object.keys can't be trusted for this:
@@ -114,14 +111,14 @@ export const CUSTOM_SPECS: Record<DrillKind, CustomSpec> = {
     noun: 'scale degrees',
     items: entries(DEGREE_ORDER, DEGREES),
     defaultItems: ['1', '3', '5'],
-    options: [KEYS_OPTION_ALL],
+    options: [KEYS_OPTION],
   },
   functions: {
     kind: 'functions',
     noun: 'chord functions',
     items: entries(FUNCTION_ORDER, FUNCTIONS),
     defaultItems: ['I', 'IV', 'V'],
-    options: [KEYS_OPTION_ALL],
+    options: [KEYS_OPTION],
   },
   progressions: {
     kind: 'progressions',

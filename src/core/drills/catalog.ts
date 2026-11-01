@@ -20,8 +20,6 @@ export type DrillConfig =
   | VoicingDrillConfig
   | ScaleDrillConfig;
 
-const EASY_KEYS = ['C', 'F', 'Bb', 'G'] as const;
-
 export const DRILLS: DrillConfig[] = [
   {
     kind: 'intervals',
@@ -204,7 +202,7 @@ export const DRILLS: DrillConfig[] = [
     title: 'Major or minor ii\u2060–\u2060V',
     description: 'The most important sound in jazz, in both flavours.',
     progressions: ['ii-V-I', 'ii-V-i'],
-    keys: EASY_KEYS,
+    keys: MAJOR_KEYS,
   },
   {
     kind: 'progressions',
@@ -212,7 +210,7 @@ export const DRILLS: DrillConfig[] = [
     title: 'Turnarounds',
     description: 'Four ways back to the top of the tune.',
     progressions: ['I-vi-ii-V', 'I-VI7-ii-V', 'iii-VI7-ii-V', 'I-vi-ii-bII7'],
-    keys: EASY_KEYS,
+    keys: MAJOR_KEYS,
   },
   {
     kind: 'progressions',

@@ -30,11 +30,11 @@ describe('key variety', () => {
     expect(seen.size).toBe(12);
   });
 
-  it('uses all 12 keys in every functional hearing level and custom mix', () => {
+  it('uses all 12 keys in every level and, by default, in every custom mix', () => {
     for (const d of DRILLS) {
-      if (d.kind === 'degrees' || d.kind === 'functions') expect(d.keys, d.id).toEqual(MAJOR_KEYS);
+      if ('keys' in d) expect(d.keys, d.id).toEqual(MAJOR_KEYS);
     }
-    for (const kind of ['degrees', 'functions'] as const) {
+    for (const kind of ['degrees', 'functions', 'progressions'] as const) {
       const drill = buildCustomDrill(kind, undefined);
       expect('keys' in drill && drill.keys).toEqual(MAJOR_KEYS);
     }
