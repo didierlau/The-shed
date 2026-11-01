@@ -16,10 +16,13 @@
   import SettingsPage from './Settings.svelte';
   import Listen from './Listen.svelte';
   import Calibrate from './Calibrate.svelte';
+  import LessonPage from './Lesson.svelte';
+  import { findLesson } from '../core/lessons';
 
   // Hash routing keeps the Android back button working:
   //   #/                  sections
   //   #/section/<id>      a section's levels and "Build your own"
+  //   #/lesson/<id>       a section's lesson: theory and examples to hear
   //   #/custom/<kind>     pick items for your own mix
   //   #/drill/<id>        practise (a level, or custom-<kind>)
   //   #/settings          app-wide settings
@@ -43,6 +46,11 @@
     if (page === 'section') {
       const group = findGroup(id);
       if (group) return { page: 'section' as const, group };
+    }
+    if (page === 'lesson') {
+      const group = findGroup(id);
+      const lesson = findLesson(id);
+      if (group && lesson) return { page: 'lesson' as const, group, lesson };
     }
     if (page === 'custom' && id in CUSTOM_SPECS) {
       return { page: 'custom' as const, kind: id as DrillKind };
@@ -74,6 +82,10 @@
   {:else if route.page === 'custom'}
     {#key route.kind}
       <CustomSetup kind={route.kind} />
+    {/key}
+  {:else if route.page === 'lesson'}
+    {#key route.group.id}
+      <LessonPage group={route.group} lesson={route.lesson} />
     {/key}
   {:else if route.page === 'listen'}
     <Listen />

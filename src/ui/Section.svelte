@@ -2,6 +2,7 @@
   import { CUSTOM_SPECS, DRILLS, customDrillId, type DrillGroup } from '../core/drills';
   import { loadProgress } from '../storage/progress';
   import { summary } from './summary';
+  import { findLesson } from '../core/lessons';
 
   let { group }: { group: DrillGroup } = $props();
 
@@ -13,6 +14,14 @@
 
 <h1>{group.title}</h1>
 <p class="lede">{group.description}</p>
+
+{#if findLesson(group.id)}
+  <a class="lesson" href={`#/lesson/${group.id}`}>
+    <span class="title">Lesson</span>
+    <span class="desc">The theory, the key sounds to know, and what to listen for.</span>
+    <span class="score">Read ›</span>
+  </a>
+{/if}
 
 <div class="custom">
   {#each group.kinds as kind (kind)}
@@ -59,6 +68,15 @@
     font-size: var(--step-1);
     margin: 2rem 0 0.5rem;
   }
+
+  .lesson {
+    border: 1px solid var(--navy-line);
+    border-radius: 0.6rem;
+    padding: 0.85rem 1rem;
+    margin-bottom: 0.5rem;
+    background: var(--navy-raised);
+  }
+  .lesson .score { color: var(--brass); }
 
   .custom { display: grid; gap: 0.5rem; }
   .custom a {
