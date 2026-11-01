@@ -34,6 +34,8 @@ export interface Question {
   choices: Choice[];
   /** The `value` of the correct choice. */
   answer: string;
+  /** Pitch class (0–11) of the key or root used, so the next question can avoid repeating it. */
+  key?: number;
   /** Short description of what was played, revealed after answering. */
   reveal: string;
   /** Optional sound played right after answering, e.g. a degree resolving to the tonic. */

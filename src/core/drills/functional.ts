@@ -66,6 +66,7 @@ export function generateDegreeQuestion(
     prompt: 'Which scale degree is the note after the cadence?',
     choices: config.degrees.map((value) => ({ value, label: DEGREES[value].label })),
     answer: degree,
+    key: Note.chroma(key),
     reveal: `${DEGREES[degree].label} in ${key}: ${degreeNote(key, degree)}`,
     resolution: path.map((s, i) => ({ notes: [Note.fromMidi(tonic + s)], beats: i === path.length - 1 ? 1.5 : 0.6 })),
   };
@@ -81,6 +82,7 @@ export function generateFunctionQuestion(config: FunctionDrillConfig, rng: Rng, 
     prompt: 'Which chord of the key comes after the cadence?',
     choices: config.functions.map((value) => ({ value, label: FUNCTIONS[value].label })),
     answer: fn,
+    key: Note.chroma(key),
     reveal: `${FUNCTIONS[fn].label} in ${key}: ${functionSymbol(key, fn)}`,
     resolution: fn === 'I' ? undefined : [{ notes: functionChord(key, 'I'), beats: 2.5 }],
   };

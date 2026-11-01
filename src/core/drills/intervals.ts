@@ -60,6 +60,7 @@ export function generateIntervalQuestion(
     prompt: 'Name the interval you hear.',
     choices: config.intervals.map((value) => ({ value, label: INTERVALS[value].label })),
     answer: interval,
+    key: bottomMidi % 12,
     reveal: `${INTERVALS[interval].label}: ${first} ${arrow} ${second}`,
   };
 }

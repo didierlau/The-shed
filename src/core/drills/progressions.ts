@@ -1,3 +1,4 @@
+import { Note } from 'tonal';
 import { PROGRESSIONS, progressionPlayback, progressionSymbols, type ProgressionName } from '../progressions';
 import type { MajorKey } from '../keys';
 import { pick, weightedPick } from '../random';
@@ -31,6 +32,7 @@ export function generateProgressionQuestion(
       return { value, label: p.label, detail: p.detail };
     }),
     answer: name,
+    key: Note.chroma(key),
     reveal: `In ${key}: ${progressionSymbols(key, name).join(' | ')}`,
   };
 }

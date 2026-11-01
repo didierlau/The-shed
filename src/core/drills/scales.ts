@@ -49,6 +49,7 @@ export function generateScaleQuestion(
     prompt: 'Which scale is this?',
     choices: config.scales.map((value) => ({ value, label: SCALES[value].label, detail: SCALES[value].detail })),
     answer: name,
+    key: root % 12,
     reveal: `${spelled.root} ${SCALES[name].label}: ${spelled.notes.join(' ')}`,
   };
 }

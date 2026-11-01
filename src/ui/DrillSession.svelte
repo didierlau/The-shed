@@ -43,7 +43,7 @@
   }
 
   async function next() {
-    question = generateQuestion(drill, Math.random, stats, settings);
+    question = generateQuestion(drill, Math.random, stats, settings, question ?? undefined);
     picked = null;
     await playSteps(question.playback);
   }

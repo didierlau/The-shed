@@ -44,6 +44,7 @@ export function generateVoicingQuestion(config: VoicingDrillConfig, rng: Rng, st
     prompt: 'Which voicing is this?',
     choices: config.voicings.map((value) => ({ value, label: VOICINGS[value].label, detail: VOICINGS[value].detail })),
     answer: type,
+    key: rootMidi % 12,
     reveal: `${VOICINGS[type].label} on ${root}${VOICING_QUALITY_SYMBOL[quality]}: ${spelled.join(' ')}`,
   };
 }

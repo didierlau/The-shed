@@ -46,6 +46,7 @@ export function generateChordQuestion(
     prompt: 'Name the chord quality you hear.',
     choices: config.qualities.map((value) => ({ value, label: CHORD_QUALITIES[value].label })),
     answer: quality,
+    key: rootMidi % 12,
     reveal: `${CHORD_QUALITIES[quality].label}: ${spelled.symbol} (${spelled.notes.join(' ')})`,
   };
 }

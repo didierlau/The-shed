@@ -140,7 +140,7 @@ export const DRILLS: DrillConfig[] = [
     title: '1, 3 and 5',
     description: 'Hear the tonic triad notes against a ii\u2060–\u2060V\u2060–\u2060I.',
     degrees: ['1', '3', '5'],
-    keys: EASY_KEYS,
+    keys: MAJOR_KEYS,
   },
   {
     kind: 'degrees',
@@ -148,7 +148,7 @@ export const DRILLS: DrillConfig[] = [
     title: '1 to 5',
     description: 'Add 2 and 4: the lower half of the scale.',
     degrees: ['1', '2', '3', '4', '5'],
-    keys: EASY_KEYS,
+    keys: MAJOR_KEYS,
   },
   {
     kind: 'degrees',
@@ -180,7 +180,7 @@ export const DRILLS: DrillConfig[] = [
     title: 'I, IV and V',
     description: 'Home, away and tension — the three pillars.',
     functions: ['I', 'IV', 'V'],
-    keys: EASY_KEYS,
+    keys: MAJOR_KEYS,
   },
   {
     kind: 'functions',
@@ -188,7 +188,7 @@ export const DRILLS: DrillConfig[] = [
     title: 'Add ii and vi',
     description: 'The chords of the turnaround: I\u2060–\u2060vi\u2060–\u2060ii\u2060–\u2060V.',
     functions: ['I', 'ii', 'IV', 'V', 'vi'],
-    keys: EASY_KEYS,
+    keys: MAJOR_KEYS,
   },
   {
     kind: 'functions',
