@@ -39,6 +39,11 @@
   <span class="desc">Play your piano and see the chord names.</span>
 </a>
 
+<a class="listen tunes" href="#/tunes">
+  <span class="title">Tunes</span>
+  <span class="desc">Import a standard from iReal Pro or type the changes, and see how it works.</span>
+</a>
+
 <style>
   header { margin: 1.5rem 0 1.75rem; }
 
@@ -102,4 +107,5 @@
     background: var(--navy-raised);
   }
   .listen .title { color: var(--brass); }
+  .tunes { margin-top: 0.75rem; }
 </style>

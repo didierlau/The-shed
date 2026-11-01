@@ -17,6 +17,9 @@
   import Listen from './Listen.svelte';
   import Calibrate from './Calibrate.svelte';
   import LessonPage from './Lesson.svelte';
+  import Tunes from './Tunes.svelte';
+  import TuneView from './TuneView.svelte';
+  import TuneEdit from './TuneEdit.svelte';
   import { findLesson } from '../core/lessons';
 
   // Hash routing keeps the Android back button working:
@@ -28,6 +31,9 @@
   //   #/settings          app-wide settings
   //   #/listen            play your piano, see chord names
   //   #/calibrate         teach the app your piano (for the microphone)
+  //   #/tunes             your tunes: import from iReal Pro or type changes
+  //   #/tune/<id>         a tune's analysis
+  //   #/tune-edit/<id>    edit a tune's changes ("new" for a new one)
   let hash = $state(location.hash);
   $effect(() => {
     const onHash = () => {
@@ -43,6 +49,9 @@
     if (page === 'settings') return { page: 'settings' as const };
     if (page === 'listen') return { page: 'listen' as const };
     if (page === 'calibrate') return { page: 'calibrate' as const };
+    if (page === 'tunes') return { page: 'tunes' as const };
+    if (page === 'tune' && id) return { page: 'tune' as const, id };
+    if (page === 'tune-edit') return { page: 'tune-edit' as const, id: id && id !== 'new' ? id : undefined };
     if (page === 'section') {
       const group = findGroup(id);
       if (group) return { page: 'section' as const, group };
@@ -86,6 +95,16 @@
   {:else if route.page === 'lesson'}
     {#key route.group.id}
       <LessonPage group={route.group} lesson={route.lesson} />
+    {/key}
+  {:else if route.page === 'tunes'}
+    <Tunes />
+  {:else if route.page === 'tune'}
+    {#key route.id}
+      <TuneView id={route.id} />
+    {/key}
+  {:else if route.page === 'tune-edit'}
+    {#key route.id}
+      <TuneEdit id={route.id} />
     {/key}
   {:else if route.page === 'listen'}
     <Listen />

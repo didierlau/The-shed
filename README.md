@@ -23,13 +23,16 @@ src/
   core/      pure music logic: theory, drills, scoring. No DOM, no audio. Fully tested.
     drills/  one file per drill kind + catalog.ts (the list of levels, as data)
     lessons/ one lesson per section (theory, key points, sounds to hear, levels to practise), as data
+    tunes/   tune charts: iReal Pro import (irealb:// links, HTML exports), typed changes,
+             and the harmonic analysis (key centres, Roman numerals, ii–V brackets, chord roles, scales)
     listen/  hearing you play: chord naming, MIDI note state, chord tracker, and for the mic:
              per-key spectra, strike detection, calibration, and note decomposition
   audio/     the only code that makes sound (smplr piano, synth fallback)
   input/     the only code that listens: Web MIDI and the microphone
   storage/   the only code that saves progress, custom selections and settings (localStorage today)
   ui/        Svelte screens; they display what core produces
-             Home (sections) → Section (lesson, levels, "Build your own") → Drill / Lesson; Settings; Listen
+             Home (sections) → Section (lesson, levels, "Build your own") → Drill / Lesson; Settings; Listen;
+             Tunes → Tune (analysis) / Tune edit
 ```
 
 The rule that keeps this maintainable: **dependencies only point inwards.**
@@ -65,13 +68,16 @@ scale, progression, voicing, degree…) and turned into notes by `lessons/exampl
    - mic: each strike is matched against the user's own piano, recorded once in a
      guided calibration (quick C3–C5 or full C2–C6); a note only counts if its own
      fundamental is there, which stops low "ghost" notes
-8. Improvisation evaluator, building on Listen:
+8. ~~Tunes: understand a standard~~ — import from iReal Pro or type the changes; see key centres,
+   ii–V(–I)s, secondary dominants, tritone subs, backdoor and borrowed chords, the form, and
+   which scales fit each chord. Works from the chords only (no melody).
+9. Improvisation evaluator, building on Listen:
    - record a take (`ChordEvent`s plus every note with its time)
-   - enter or pick the tune's changes, so each note has a chord context
+   - pick the tune's changes from Tunes, so each note has a chord context
    - per chord, find the scale(s) the notes fit (Dorian, Mixolydian, altered, bebop…)
      and whether that scale suits the chord and the tune's key
    - show where the line left the changes, and how often it landed on guide tones
-9. Offline support (service worker) and Play Store wrapper (Capacitor)
+10. Offline support (service worker) and Play Store wrapper (Capacitor)
 
 ## Tech
 
